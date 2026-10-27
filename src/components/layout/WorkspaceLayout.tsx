@@ -1,0 +1,61 @@
+import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { AlertCircle, Menu, Moon, Sun, X } from "lucide-react";
+import type { WorkspaceLayoutProps } from "../workspace/workspace.types";
+import { ProfileMenu } from "../workspace/ProfileMenu";
+import { WorkspaceSidebar } from "../workspace/WorkspaceSidebar";
+
+export function WorkspaceLayout({
+  session,
+  theme,
+  jobs,
+  activeJob,
+  loading,
+  error,
+  onToggleTheme,
+  onSignOut,
+  onOpenJob,
+  onStartNew,
+  onDismissError,
+}: WorkspaceLayoutProps) {
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isNewResearch = location.pathname.endsWith("/research/new");
+  const isReport = /^\/workspace\/research\/[^/]+$/.test(location.pathname) && !isNewResearch;
+  const isSettings = location.pathname.endsWith("/settings");
+  const pageTitle = isNewResearch ? "New research" : isReport ? "Research report" : isSettings ? "Settings" : "Overview";
+
+  return (
+    <div className={`app-shell theme-${theme}`}>
+      <WorkspaceSidebar
+        session={session}
+        jobs={jobs}
+        activeJob={activeJob}
+        loading={loading}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onOpenJob={onOpenJob}
+        onStartNew={onStartNew}
+      />
+      <main className="main-area">
+        <header className="topbar">
+          <div className="breadcrumbs">
+            <button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setSidebarOpen(true)}><Menu size={19} /></button>
+            <span className="hidden sm:inline">Workspace</span><span className="crumb-separator hidden sm:inline">/</span><strong>{pageTitle}</strong>
+          </div>
+          <div className="topbar-actions">
+            <span className="environment-badge"><span /> {import.meta.env.DEV ? "Development environment" : "Research workspace"}</span>
+            <button className="icon-button help-button" aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`} onClick={onToggleTheme}>
+              {theme === "light" ? <Moon size={17} /> : <Sun size={17} />}
+            </button>
+            <ProfileMenu session={session} theme={theme} onToggleTheme={onToggleTheme} onSignOut={onSignOut} />
+          </div>
+        </header>
+        <div className="page-content">
+          {error && <div className="alert-banner"><AlertCircle size={17} /><span>{error}</span><button className="icon-button" aria-label="Dismiss error" onClick={onDismissError}><X size={16} /></button></div>}
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
