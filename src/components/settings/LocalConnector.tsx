@@ -16,6 +16,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
   const [desktop, setDesktop] = useState(false);
   const [copied, setCopied] = useState(false);
   const [guideStep, setGuideStep] = useState(0);
+  const [reviewGuide, setReviewGuide] = useState(false);
   const [platform, setPlatform] = useState(navigator.platform.includes("Mac") ? "mac" : navigator.platform.includes("Win") ? "windows" : "linux");
   const connected = relay.phase === "ready";
   const connecting = relay.phase === "connecting";
@@ -42,30 +43,32 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
     try { await request("/connectors/connection", { method: "DELETE" }); }
     catch { setError("This tab has stopped using local models. The server will mark it offline shortly."); }
   };
-  if (desktop) return <>
+  if (desktop) return <div id="local-model-setup" tabIndex={-1}>
     <button className="text-button" type="button" onClick={() => setDesktop(false)}>Use Ollama through this browser instead</button>
     <DesktopConnector config={config} onChange={onChange} />
-  </>;
+  </div>;
 
   return <section id="local-model-setup" tabIndex={-1} className="form-card surface-card settings-card local-connector">
     <div className="form-section-title"><span className="form-step"><Laptop size={18} /></span><div><h2>Let’s connect your local model</h2><p>We’ll guide you through it. You only need to allow this website once on each computer.</p></div></div>
+    {connected && <button className="text-button" type="button" aria-expanded={reviewGuide} onClick={() => { setReviewGuide(!reviewGuide); setGuideStep(0); }}>{reviewGuide ? "Close setup guide" : "View setup guide again"}</button>}
+    {connected && reviewGuide && <p>Your connection stays active while you read the guide. You can skip steps you’ve already completed.</p>}
     <ol className="local-setup-steps" aria-label="Local model setup progress">
       {["Open Ollama", "Allow this website", "Choose your model"].map((label, index) => <li key={label}>
-        <button type="button" aria-current={(connected ? 2 : guideStep) === index ? "step" : undefined} disabled={connected || connecting} onClick={() => setGuideStep(index)}>
+        <button type="button" aria-current={(connected && !reviewGuide ? 2 : guideStep) === index ? "step" : undefined} disabled={connecting} onClick={() => { setGuideStep(index); if (connected) setReviewGuide(true); }}>
           <span>{connected && (index < 2 || selected) ? <CheckCircle2 size={16} /> : index + 1}</span>{label}
         </button>
       </li>)}
     </ol>
-    {!connected && guideStep === 0 && <div className="local-setup-panel">
+    {(!connected || reviewGuide) && guideStep === 0 && <div className="local-setup-panel">
       <h3>1. Open Ollama on this computer</h3>
       <p>Ollama runs the model on your computer. If you already use it, open it now.</p>
       <p>New to Ollama? <a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama</a>, open it, and download a chat model in Ollama before continuing.</p>
       <button className="primary-button" type="button" onClick={() => setGuideStep(1)}>Ollama is open — next</button>
       <button className="text-button" type="button" onClick={() => setGuideStep(2)}>Already set up this website? Connect now</button>
     </div>}
-    {!connected && guideStep === 2 && <div className="local-setup-panel">
+    {(!connected || reviewGuide) && guideStep === 2 && <div className="local-setup-panel">
       <h3>3. Connect, then choose your model</h3>
-      <p>Click Connect Ollama below. If your browser asks to access this computer’s local network, choose Allow. Your installed models will appear here after it connects.</p>
+      <p>{connected ? "You’re already connected. Choose a model below whenever you want to change it. Your choice is saved automatically." : "Click Connect Ollama below. If your browser asks to access this computer’s local network, choose Allow. Your installed models will appear here after it connects."}</p>
     </div>}
     <p className={connected ? "local-connector-status" : ""} role="status">{connected && <CheckCircle2 size={16} />}{relay.message}</p>
     {connected ? <>
@@ -76,7 +79,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
         </select>
       </label>
       {!relay.models.length && <p>Install a chat model in Ollama. It will appear here automatically. Embedding models are excluded.</p>}
-      {selected && <><p className="local-connector-status"><CheckCircle2 size={16} /> You’re ready! Your model choice is saved.</p><Link className="primary-button" to="/workspace/research/new">Start your first research</Link></>}
+      {selected && <><p className="local-connector-status"><CheckCircle2 size={16} /> You’re ready! Your model choice is saved.</p><Link className="primary-button" to="/workspace/research/new">Start research</Link></>}
       <p className="local-connector-hint">Keep Ollama running and this tab open while research runs. Prompts and results pass through ResearchPilot; model inference runs on your computer.</p>
       <button className="text-button" type="button" onClick={() => { void disconnect(); }}><Unplug size={14} /> Disconnect</button>
     </> : guideStep === 2 && <div className="local-connector-actions">
@@ -85,7 +88,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
       </button>
       {connecting && <button className="secondary-button" type="button" onClick={() => browserOllama.stop(true)}>Cancel</button>}
     </div>}
-    {!connected && (guideStep === 1 || (guideStep === 2 && relay.phase === "error")) && <div className="ollama-browser-setup local-setup-panel">
+    {((!connected || reviewGuide) && guideStep === 1 || (!connected && guideStep === 2 && relay.phase === "error")) && <div className="ollama-browser-setup local-setup-panel">
       <h3>2. Allow ResearchPilot to use Ollama</h3>
       <p>This one-time step lets this website talk to Ollama. Copy the command below, paste it into {platform === "windows" ? "PowerShell" : "Terminal"}, and press Enter. Then come back here.</p>
       <label className="field-label" htmlFor="ollama-setup-platform">Your computer

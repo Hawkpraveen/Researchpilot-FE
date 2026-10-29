@@ -4,6 +4,7 @@ import type { SettingsProps } from "./settings.types";
 import { useSettingsForm } from "./useSettingsForm";
 import type { ProviderConfig } from "../../types";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { WorkspaceNameSettings } from "./WorkspaceNameSettings";
 import { LocalConnector, CONNECTOR_ENDPOINT } from "./LocalConnector";
 
@@ -140,6 +141,7 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
               section?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
               section?.focus({ preventScroll: true });
             }}>Take me to setup <ArrowUpRight size={14} /></button>
+            <Link className="settings-rail-link" to="/workspace/guide">Explore the app guide <ArrowUpRight size={14} /></Link>
           </section>
         </aside>
       </div>

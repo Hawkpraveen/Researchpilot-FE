@@ -5,6 +5,7 @@ import { NewResearch } from "../components/research-form/NewResearchPage";
 
 import { ReportView } from "../components/research-report/ResearchReportPage";
 import { SettingsView } from "../components/settings/SettingsPage";
+import { AppGuide } from "../components/guide/AppGuide";
 import { ProfileSettingsPage } from "../components/workspace/ProfileSettingsPage";
 import { WorkspaceLayout } from "../components/layout/WorkspaceLayout";
 import type { AppRoutesProps, AuthRouteMode } from "./app-routes.types";
@@ -106,6 +107,7 @@ export function AppRoutes(props: AppRoutesProps) {
             workspaceName={props.workspaceName}
             onSaveWorkspaceName={props.onSaveWorkspaceName}
           />} />
+          <Route path="guide" element={<AppGuide />} />
           <Route path="profile" element={<ProfileSettingsPage session={props.session!} onSave={props.onUpdateProfile} onUploadPicture={props.onUpdateProfilePicture} onDeletePicture={props.onRemoveProfilePicture} />} />
         </Route>
       </Route>

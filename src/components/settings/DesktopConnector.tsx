@@ -5,6 +5,7 @@ import { saveProviderConfig } from "../../services/researchApi";
 import type { ProviderConfig } from "../../types";
 
 import { CONNECTOR_ENDPOINT } from "../../constants/localModels";
+import { DesktopSetupGuide } from "./DesktopSetupGuide";
 interface Status { connected: boolean; name: string | null; models: string[]; message: string }
 export function DesktopConnector({ config, onChange }: { config: ProviderConfig; onChange: (config: ProviderConfig) => void }) {
   const [status, setStatus] = useState<Status | null>(null);
@@ -55,6 +56,7 @@ export function DesktopConnector({ config, onChange }: { config: ProviderConfig;
   const selected = config.endpoint === CONNECTOR_ENDPOINT && status?.models.includes(config.model) ? config.model : "";
   return <section className="form-card surface-card settings-card local-connector">
     <div className="form-section-title"><span className="form-step"><Laptop size={18} /></span><div><h2>Your local models</h2><p>Run research on your computer with Ollama.</p></div></div>
+    <DesktopSetupGuide />
     {status?.connected ? <>
       <p className="local-connector-status"><CheckCircle2 size={16} /> {status.name || "Your computer"} is connected</p>
       <label className="field-label" htmlFor="connector-model">Model

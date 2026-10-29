@@ -1,7 +1,8 @@
 import "./layout.styles.css";
 import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import { AlertCircle, Menu, Moon, Sun, X } from "lucide-react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { AlertCircle, BookOpen, Menu, Moon, Sun, X } from "lucide-react";
+import "../guide/guide.styles.css";
 import type { WorkspaceLayoutProps } from "../workspace/workspace.types";
 import { ProfileMenu } from "../workspace/ProfileMenu";
 import { WorkspaceSidebar } from "../workspace/WorkspaceSidebar";
@@ -31,7 +32,7 @@ export function WorkspaceLayout({
   const isReport = /^\/workspace\/research\/[^/]+$/.test(location.pathname) && !isNewResearch;
   const isSettings = location.pathname.endsWith("/settings");
   const isProfile = location.pathname.endsWith("/profile");
-  const pageTitle = isNewResearch ? "New research" : isReport ? "Research report" : isProfile ? "Profile settings" : isSettings ? "Settings" : "Overview";
+  const pageTitle = location.pathname.endsWith("/guide") ? "App guide" : isNewResearch ? "New research" : isReport ? "Research report" : isProfile ? "Profile settings" : isSettings ? "Settings" : "Overview";
 
   return (
     <div className={`app-shell theme-${theme}`}>
@@ -55,6 +56,7 @@ export function WorkspaceLayout({
             <span className="hidden sm:inline">Workspace</span><span className="crumb-separator hidden sm:inline">/</span><strong>{pageTitle}</strong>
           </div>
           <div className="topbar-actions">
+            <NavLink className="app-guide-link" to="/workspace/guide"><BookOpen size={17} /> Guide</NavLink>
             <button className="icon-button help-button" aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`} onClick={onToggleTheme}>
               {theme === "light" ? <Moon size={17} /> : <Sun size={17} />}
             </button>
