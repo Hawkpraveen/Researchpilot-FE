@@ -4,11 +4,12 @@ import { checkAgentConnection, getProviderConfig, getWorkspaceName, saveProvider
 import type { ProviderConfig } from "../../types";
 import { messages } from "../../constants/messages";
 import { request } from "../../services/apiClient";
+import { CONNECTOR_ENDPOINT } from "../../constants/localModels";
 
 const defaultConfig: ProviderConfig = {
   mode: "local",
   provider: "ollama",
-  endpoint: "http://connector.local",
+  endpoint: CONNECTOR_ENDPOINT,
   model: "llama3.2:3b",
   apiKey: "",
 };
@@ -17,6 +18,7 @@ export function useProviderSettings(enabled: boolean) {
   const location = useLocation();
   const autoLoadModels = enabled && location.pathname.endsWith("/settings");
   const [config, setConfig] = useState<ProviderConfig>(defaultConfig);
+  const [loaded, setLoaded] = useState(false);
   const [connectionState, setConnectionState] = useState<{ connected: boolean; message: string; models?: string[] } | null>(null);
   const [workspaceName, setWorkspaceName] = useState("Personal workspace");
   const testSequence = useRef(0);
@@ -31,10 +33,10 @@ export function useProviderSettings(enabled: boolean) {
   };
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) { setLoaded(false); return; }
     let active = true;
     void getProviderConfig().then((nextConfig) => {
-      if (active) setConfig(nextConfig);
+      if (active) { setConfig(nextConfig); setLoaded(true); }
       if (active && autoLoadModels) void testConfig(nextConfig);
     }).catch(() => undefined);
     void getWorkspaceName().then(({ workspace_name }) => {
@@ -85,5 +87,5 @@ export function useProviderSettings(enabled: boolean) {
     setWorkspaceName(result.workspace_name);
   };
 
-  return { config, setConfig: updateConfig, connectionState, workspaceName, saveWorkspaceName, save, testConnection };
+  return { config, loaded, setConfig: updateConfig, connectionState, workspaceName, saveWorkspaceName, save, testConnection };
 }

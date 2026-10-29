@@ -8,6 +8,11 @@
 .local-connector .local-connector-hint { font-size: 12px; }
 .local-connector .local-connector-error { color: #db6b79; }
 .local-connector .text-button { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; }
+.ollama-browser-setup { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.ollama-browser-setup summary { cursor: pointer; font-size: 13px; font-weight: 700; }
+.ollama-browser-setup[open] { display: flex; flex-direction: column; gap: 14px; }
+.ollama-browser-setup pre { margin: 0; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.ollama-browser-setup a { color: var(--purple); font-size: 12px; }
 
 /* settings component styles, including responsive and theme variants. */
 

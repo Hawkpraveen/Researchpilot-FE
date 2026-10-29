@@ -130,11 +130,11 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
           <section className="settings-note-card">
             <div className="settings-note-icon"><LockKeyhole size={16} /></div>
             <strong>{config.mode === "local" ? "Your computer, your models" : "Your key stays private"}</strong>
-            <p>{config.mode === "local" ? "Only your paired computer receives model requests. Keep Ollama and the connector running while you research." : "Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API."}</p>
+            <p>{config.mode === "local" ? "Only your connected computer receives model requests. Keep Ollama running and your ResearchPilot tab open while you research." : "Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API."}</p>
           </section>
           <section className="settings-help-card">
             <span className="nav-label">QUICK GUIDE</span>
-            <div><span>1</span><p>{config.mode === "local" ? "Open your connector" : "Pick your provider"}</p></div>
+            <div><span>1</span><p>{config.mode === "local" ? "Connect Ollama" : "Pick your provider"}</p></div>
             <div><span>2</span><p>{config.mode === "local" ? "Choose an installed model" : "Enter the endpoint and model"}</p></div>
             <div><span>3</span><p>{config.mode === "local" ? "Start your research" : "Test, then save"}</p></div>
           </section>

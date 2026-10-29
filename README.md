@@ -10,13 +10,14 @@ OAuth providers, phone OTP, and 2FA are UI placeholders and are not enabled.
 
 ## Source structure
 
-Local model users select **Local LLM (your computer)** in Settings. The Windows
-connector download is served from `public/downloads/`. After a one-time pairing
-and browser local-network approval, choosing an installed model saves it
-automatically. The connector source and reproducible Windows build script live
-in the independent agent repository under `connector/`; deploy the connector
-API/backend and updated agent before publishing this UI. The connector, Ollama
-and computer must stay running for local research.
+Local model users select **Local LLM (your computer)** in Settings and connect
+through the browser, without downloading our desktop app. After the one-time
+Ollama origin setting and browser permission, choosing a model saves it immediately.
+Keep Ollama and the ResearchPilot tab open while researching. See
+[Browser local models](Documents/Browser-Local-Models.md) for setup and limits.
+The Windows desktop connector remains an optional alternative. Its download is
+served from `public/downloads/`; source/build instructions live in the agent repo
+under `connector/`. Deploy the connector-compatible API/agent before this UI.
 
 - `src/app/` composes feature hooks and the route tree.
 - `src/routes/` defines URL routes and the authenticated workspace guard.

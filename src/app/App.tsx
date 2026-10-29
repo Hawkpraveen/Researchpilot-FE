@@ -6,6 +6,7 @@ import { useResearchForm } from "../components/research-form/useResearchForm";
 import { useResearchHistory } from "../components/research-history/useResearchHistory";
 import { useProviderSettings } from "../components/settings/useProviderSettings";
 import { useTheme } from "../hooks/useTheme";
+import { useBrowserOllamaSession } from "../components/settings/useBrowserOllama";
 
 function App() {
   const auth = useAuth();
@@ -13,6 +14,9 @@ function App() {
   const history = useResearchHistory(Boolean(auth.session));
   const researchForm = useResearchForm(history.addJob);
   const providerSettings = useProviderSettings(Boolean(auth.session));
+  const localScope = auth.session && providerSettings.loaded && providerSettings.config.mode === "local"
+    ? JSON.stringify([auth.session.user.tenant_id, auth.session.user.workspace_id, auth.session.user.id]) : null;
+  useBrowserOllamaSession(localScope);
   const [activeReportTab, setActiveReportTab] = useState<ResearchReportTab>("overview");
 
   const startNewResearch = () => {
