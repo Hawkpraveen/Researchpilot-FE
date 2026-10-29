@@ -847,6 +847,9 @@ html[data-theme="dark"] .auth-card:has(#signup-name) .signup-social-panel button
 }
 
 .oauth-google-button {
+  /* Keep the Google iframe's transparent canvas in its native light color scheme.
+     The button's own dark appearance is configured through Google's theme option. */
+  color-scheme: light;
   display: flex;
   min-width: 0;
   min-height: 40px;
@@ -855,6 +858,8 @@ html[data-theme="dark"] .auth-card:has(#signup-name) .signup-social-panel button
 }
 
 .oauth-google-button iframe {
+  color-scheme: light;
+  background: transparent;
   display: block;
   border: 0;
   max-width: none;
