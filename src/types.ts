@@ -68,16 +68,21 @@ export type UserRole = "super_admin" | "user";
 
 export interface AuthUser {
   id: string;
+  tenant_id: string;
+  workspace_id: string;
   email: string;
-  name: string;
+  first_name: string;
+  last_name: string;
+  auth_type?: "basic_auth" | "google" | "microsoft";
+  profile_url?: string;
   role: UserRole;
   twoFactorEnabled: boolean;
 }
 
 export interface AuthSession {
   user: AuthUser;
-  accessToken: string;
-  expiresAt?: string;
+  access_token: string;
+  expires_at?: string;
   requiresTwoFactor?: boolean;
   challengeId?: string;
 }

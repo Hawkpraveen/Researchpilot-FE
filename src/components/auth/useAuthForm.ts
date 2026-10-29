@@ -6,8 +6,8 @@ export function useAuthForm({ mode, onSignIn, onSignUp, onVerify, onModeChange }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
-  const [showDemo, setShowDemo] = useState(false);
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [signupNotice, setSignupNotice] = useState("");
   const [signupNoticeIsError, setSignupNoticeIsError] = useState(false);
@@ -29,7 +29,7 @@ export function useAuthForm({ mode, onSignIn, onSignUp, onVerify, onModeChange }
       setSignupNoticeIsError(true);
       return;
     }
-    await onSignUp(fullName.trim(), email.trim(), password);
+    await onSignUp(firstName.trim(), lastName.trim(), email.trim(), password);
     setSignupNotice("");
     setSignupNoticeIsError(false);
   };
@@ -41,7 +41,6 @@ export function useAuthForm({ mode, onSignIn, onSignUp, onVerify, onModeChange }
   };
 
   const backToSignIn = () => onModeChange("signin");
-  const togglePhoneLogin = () => setShowDemo((value) => !value);
   const updateCode = (value: string) => setCode(value.replace(/\D/g, ""));
 
   return {
@@ -52,10 +51,10 @@ export function useAuthForm({ mode, onSignIn, onSignUp, onVerify, onModeChange }
     setPassword,
     code,
     updateCode,
-    showDemo,
-    togglePhoneLogin,
-    fullName,
-    setFullName,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     confirmPassword,
     setConfirmPassword,
     signupNotice,

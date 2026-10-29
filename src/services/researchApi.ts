@@ -1,8 +1,7 @@
 import type { CreateResearchRequest, ProviderConfig, ResearchJob, ResearchReport } from "../types";
-import { getAccessToken } from "./authToken";
+import { request } from "./apiClient";
+import { messages } from "../constants/messages";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:5000/api/v1";
-const DEMO_MODE = (import.meta.env.VITE_DEMO_MODE as string | undefined) !== "false";
 const RESEARCH_DEMO_MODE = (
   (import.meta.env.VITE_RESEARCH_DEMO_MODE as string | undefined)
   ?? (import.meta.env.VITE_DEMO_MODE as string | undefined)
@@ -114,29 +113,6 @@ const demoJobs: ResearchJob[] = [
   },
 ];
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-  });
-  if (!response.ok) {
-    const body: unknown = await response.json().catch(() => null);
-    const message =
-      typeof body === "object" && body !== null && "error" in body
-        && typeof body.error === "object" && body.error !== null
-        && "message" in body.error && typeof body.error.message === "string"
-        ? body.error.message
-        : `Request failed (${response.status})`;
-    throw new Error(message);
-  }
-  return response.json() as Promise<T>;
-}
-
 export async function listResearch(): Promise<ResearchJob[]> {
   if (RESEARCH_DEMO_MODE) {
     await wait(180);
@@ -149,7 +125,7 @@ export async function getResearch(id: string): Promise<ResearchJob> {
   if (RESEARCH_DEMO_MODE) {
     await wait(120);
     const job = demoJobs.find((item) => item.id === id);
-    if (!job) throw new Error("Research job not found");
+    if (!job) throw new Error(messages.researchNotFound);
     return job;
   }
   return request<ResearchJob>(`/research-jobs/${encodeURIComponent(id)}`);
@@ -177,22 +153,31 @@ export async function createResearch(input: CreateResearchRequest): Promise<Rese
 }
 
 export async function saveProviderConfig(config: ProviderConfig): Promise<void> {
-  if (DEMO_MODE) {
-    await wait(240);
-    return;
-  }
   await request("/settings/provider", { method: "PUT", body: JSON.stringify(config) });
 }
 
-export async function checkAgentConnection(): Promise<{ connected: boolean; message: string }> {
-  if (RESEARCH_DEMO_MODE) {
-    await wait(260);
-    return { connected: true, message: "Demo agent is ready" };
-  }
+export function getProviderConfig(): Promise<ProviderConfig> {
+  return request<ProviderConfig>("/settings/provider");
+}
+
+export async function checkAgentConnection(config: ProviderConfig): Promise<{ connected: boolean; message: string; models?: string[] }> {
   try {
-    await request("/health");
-    return { connected: true, message: "Backend is reachable; the Agent is checked when a research job runs." };
-  } catch {
-    return { connected: false, message: "Could not reach the configured API" };
+    return await request<{ connected: boolean; message: string; models?: string[] }>("/settings/provider/test", {
+      method: "POST",
+      body: JSON.stringify(config),
+    });
+  } catch (error) {
+    return { connected: false, message: error instanceof Error ? error.message : messages.providerConnectionFailed };
   }
+}
+
+export function getWorkspaceName(): Promise<{ workspace_name: string }> {
+  return request<{ workspace_name: string }>("/settings/workspace");
+}
+
+export async function saveWorkspaceName(workspaceName: string): Promise<{ workspace_name: string }> {
+  return request<{ workspace_name: string }>("/settings/workspace", {
+    method: "PUT",
+    body: JSON.stringify({ workspace_name: workspaceName.trim() }),
+  });
 }

@@ -4,11 +4,16 @@ import { Dashboard } from "../components/dashboard/DashboardPage";
 import { NewResearch } from "../components/research-form/NewResearchPage";
 import { ReportView } from "../components/research-report/ResearchReportPage";
 import { SettingsView } from "../components/settings/SettingsPage";
+import { ProfileSettingsPage } from "../components/workspace/ProfileSettingsPage";
 import { WorkspaceLayout } from "../components/layout/WorkspaceLayout";
 import type { AppRoutesProps, AuthRouteMode } from "./app-routes.types";
 
 export function AppRoutes(props: AppRoutesProps) {
   const navigate = useNavigate();
+
+  if (props.authInitializing) {
+    return <div className="auth-bootstrap" role="status" aria-live="polite"><div className="auth-bootstrap-mark">✦</div><strong>Restoring your workspace</strong><span>Checking your saved session…</span></div>;
+  }
 
   const authPage = (mode: AuthRouteMode) => (
     <AuthView
@@ -21,7 +26,6 @@ export function AppRoutes(props: AppRoutesProps) {
       challenge={null}
       onSignIn={props.onSignIn}
       onSignUp={props.onSignUp}
-      onDemoLogin={props.onDemoLogin}
       onVerify={props.onVerify}
       onOAuth={props.onOAuth}
     />
@@ -47,7 +51,6 @@ export function AppRoutes(props: AppRoutesProps) {
                 challenge={props.authChallenge}
                 onSignIn={props.onSignIn}
                 onSignUp={props.onSignUp}
-                onDemoLogin={props.onDemoLogin}
                 onVerify={props.onVerify}
                 onOAuth={props.onOAuth}
               />
@@ -58,6 +61,7 @@ export function AppRoutes(props: AppRoutesProps) {
           path="/workspace"
           element={props.session ? <WorkspaceLayout
             session={props.session}
+            workspaceName={props.workspaceName}
             theme={props.theme}
             jobs={props.jobs}
             activeJob={props.activeJob}
@@ -96,7 +100,10 @@ export function AppRoutes(props: AppRoutesProps) {
             onChange={props.onProviderConfigChange}
             onSave={props.onSaveProviderConfig}
             onTest={props.onTestProviderConnection}
+            workspaceName={props.workspaceName}
+            onSaveWorkspaceName={props.onSaveWorkspaceName}
           />} />
+          <Route path="profile" element={<ProfileSettingsPage session={props.session!} onSave={props.onUpdateProfile} onUploadPicture={props.onUpdateProfilePicture} onDeletePicture={props.onRemoveProfilePicture} />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate replace to={props.session ? "/workspace" : "/login"} />} />

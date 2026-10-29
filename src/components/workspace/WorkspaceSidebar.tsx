@@ -1,25 +1,34 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Building2, Check, ChevronDown, FileText, LayoutDashboard, Pencil, Plus, Settings2, Sparkles, Trash2, X, Zap } from "lucide-react";
 import type { WorkspaceSidebarProps } from "./workspace.types";
+import type { ResearchStatus } from "../../types";
 import { WorkspaceDialog } from "./WorkspaceDialog";
 import { useWorkspaceManager } from "./useWorkspaceManager";
+import { ProfileAvatar } from "./ProfileAvatar";
 
 const RESEARCH_DEMO_MODE = (
   (import.meta.env.VITE_RESEARCH_DEMO_MODE as string | undefined)
   ?? (import.meta.env.VITE_DEMO_MODE as string | undefined)
 ) !== "false";
 
-export function WorkspaceSidebar({ session, jobs, activeJob, loading, open, onClose, onOpenJob, onStartNew }: WorkspaceSidebarProps) {
+function statusLabel(status: ResearchStatus) {
+  return ({ completed: "Completed", running: "In progress", queued: "Queued", failed: "Interrupted" })[status];
+}
+
+export function WorkspaceSidebar({ session, workspaceName, jobs, activeJob, loading, open, onClose, onOpenJob, onStartNew }: WorkspaceSidebarProps) {
+  const [historyOpen, setHistoryOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const {
     workspaces, activeWorkspace, setActiveWorkspace, menuOpen, setMenuOpen, dialog, name, setName,
     error, setError, menuRef, openDialog, save, remove, closeDialog,
-  } = useWorkspaceManager();
+  } = useWorkspaceManager(workspaceName);
   const isNewResearch = location.pathname.endsWith("/research/new");
   const isReport = /^\/workspace\/research\/[^/]+$/.test(location.pathname) && !isNewResearch;
   const isSettings = location.pathname.endsWith("/settings");
-  const userInitials = session.user.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const displayName = [session.user.first_name, session.user.last_name].filter(Boolean).join(" ") || session.user.email;
+  const userInitials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   const navigateTo = (path: string) => {
     onClose();
@@ -48,7 +57,7 @@ export function WorkspaceSidebar({ session, jobs, activeJob, loading, open, onCl
               <span className="workspace-menu-icon"><Building2 size={15} /></span><span>{workspace}</span>{activeWorkspace === workspace && <Check size={15} />}
             </button>
             <div className="workspace-menu-actions">
-              <button type="button" aria-label={`Edit ${workspace}`} title="Edit workspace" onClick={() => openDialog("edit", workspace)}><Pencil size={14} /></button>
+              <button type="button" aria-label={`Edit ${workspace}`} title="Edit workspace settings" onClick={() => navigateTo("/workspace/settings")}><Pencil size={14} /></button>
               <button type="button" aria-label={`Delete ${workspace}`} title={workspaces.length === 1 ? "Keep at least one workspace" : "Delete workspace"} disabled={workspaces.length === 1} onClick={() => openDialog("delete", workspace)}><Trash2 size={14} /></button>
             </div>
           </div>)}
@@ -65,25 +74,33 @@ export function WorkspaceSidebar({ session, jobs, activeJob, loading, open, onCl
         <button className={isSettings ? "nav-item active" : "nav-item"} onClick={() => navigateTo("/workspace/settings")}><Settings2 size={17} /> Settings</button>
       </nav>
 
-      <div className="history-heading"><span className="nav-label">RECENT RESEARCH</span><button className="icon-button tiny" aria-label="New research" onClick={onStartNew}><Plus size={15} /></button></div>
-      <div className="history-list">
-        {jobs.map((job) => <button key={job.id} className={`history-item ${activeJob?.id === job.id ? "history-active" : ""}`} onClick={() => onOpenJob(job)}>
+      <div className="history-heading">
+        <button className={`history-toggle ${historyOpen ? "is-open" : ""}`} aria-expanded={historyOpen} aria-controls="recent-research-list" onClick={() => setHistoryOpen((value) => !value)}>
+          <span className="history-heading-label"><span className="nav-label">RECENT</span><span className="history-count">{jobs.length}</span></span>
+          <ChevronDown size={14} className="history-chevron" />
+        </button>
+        <button className="icon-button tiny" aria-label="Start new research" title="Start new research" onClick={onStartNew}><Plus size={15} /></button>
+      </div>
+      <div className={`history-list ${historyOpen ? "history-list-open" : "history-list-closed"}`} id="recent-research-list" aria-hidden={!historyOpen}>
+        {jobs.map((job) => <button key={job.id} className={`history-item ${activeJob?.id === job.id ? "history-active" : ""}`} title={job.title} onClick={() => onOpenJob(job)}>
           <span className={`history-icon ${job.status}`}><FileText size={14} /></span>
-          <span className="history-text"><strong>{job.title}</strong><small>{job.createdAt}</small></span>
+          <span className="history-text"><strong>{job.title}</strong><small>{job.sourceCount ? `${job.sourceCount} source${job.sourceCount === 1 ? "" : "s"}` : statusLabel(job.status)} <span className="history-separator">·</span> {job.createdAt}</small></span>
+          <span className={`history-status history-status-${job.status}`} aria-label={statusLabel(job.status)} />
         </button>)}
-        {!jobs.length && !loading && <p className="empty-small">Your research runs will appear here.</p>}
+        {loading && <div className="history-loading" aria-label="Loading research history"><span /><span /><span /></div>}
+        {!jobs.length && !loading && <div className="history-empty"><FileText size={15} /><p>Your research runs will appear here.</p><button type="button" onClick={onStartNew}>Start your first run</button></div>}
       </div>
 
       <div className="sidebar-bottom">
         <div className="usage-card surface-card">
-          <div className="usage-top"><span className="usage-icon"><Zap size={15} /></span><strong>Research budget</strong><span className="free-tag">FREE</span></div>
-          <p>{RESEARCH_DEMO_MODE ? "Demo data · no paid requests" : "Plan only · no provider calls"}</p>
+          <div className="usage-top"><span className="usage-icon"><Zap size={15} /></span><strong>Research budget</strong><span className="free-tag">BOUNDED</span></div>
+          <p>{RESEARCH_DEMO_MODE ? "Demo data · no paid requests" : "Web search · your selected model"}</p>
           <div className="usage-track"><span /></div>
-          <small>Paid providers are never enabled automatically.</small>
+          <small>Search and cloud providers may charge for usage.</small>
         </div>
-        <button className="profile-button" type="button" onClick={() => navigateTo("/workspace/settings")}>
-          <div className="profile-avatar">{userInitials}</div>
-          <span><strong>{session.user.name}</strong><small>{session.user.role.replace("_", " ")}</small></span>
+        <button className="profile-button" type="button" aria-label="Open profile settings" onClick={() => navigateTo("/workspace/profile")}>
+          <ProfileAvatar url={session.user.profile_url} initials={userInitials} className="profile-avatar" />
+          <span><strong>{displayName}</strong><small>{session.user.role.replace("_", " ")}</small></span>
           <ChevronDown size={15} />
         </button>
       </div>

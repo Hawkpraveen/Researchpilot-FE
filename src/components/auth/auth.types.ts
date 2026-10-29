@@ -1,7 +1,7 @@
 import type { AuthSession } from "../../types";
 
 export type AuthMode = "signin" | "signup";
-export type OAuthProvider = "google" | "microsoft" | "github";
+export type OAuthProvider = "google" | "microsoft";
 
 export interface AuthPageProps {
   mode: AuthMode;
@@ -12,8 +12,7 @@ export interface AuthPageProps {
   error: string;
   challenge: AuthSession | null;
   onSignIn: (email: string, password: string) => Promise<void>;
-  onSignUp: (name: string, email: string, password: string) => Promise<void>;
-  onDemoLogin: () => Promise<void>;
+  onSignUp: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   onVerify: (code: string) => Promise<void>;
-  onOAuth: (provider: OAuthProvider) => void;
+  onOAuth: (provider: OAuthProvider, idToken: string) => Promise<void>;
 }

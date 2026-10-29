@@ -11,7 +11,7 @@ function App() {
   const theme = useTheme();
   const history = useResearchHistory(Boolean(auth.session));
   const researchForm = useResearchForm(history.addJob);
-  const providerSettings = useProviderSettings();
+  const providerSettings = useProviderSettings(Boolean(auth.session));
   const [activeReportTab, setActiveReportTab] = useState<"overview" | "evidence">("overview");
 
   const startNewResearch = () => {
@@ -24,8 +24,14 @@ function App() {
     researchForm.setError("");
   };
 
-  return <AppRoutes
+  return <>
+    {auth.toast && <div className={`fixed right-4 top-4 z-50 flex max-w-sm items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg ${auth.toast.type === "success" ? "border-[#a8e0c9] bg-[#effbf5] text-[#176a4e]" : "border-[#f3cdd1] bg-[#fff3f4] text-[#b34d57]"}`} role="alert">
+      <span>{auth.toast.message}</span>
+      <button type="button" onClick={auth.dismissToast} aria-label="Dismiss notification">×</button>
+    </div>}
+    <AppRoutes
     session={auth.session}
+    authInitializing={auth.initializing}
     theme={theme.theme}
     authLoading={auth.loading}
     authError={auth.error}
@@ -34,9 +40,11 @@ function App() {
     onAuthModeChange={auth.changeMode}
     onSignIn={auth.signIn}
     onSignUp={auth.signUp}
-    onDemoLogin={auth.signInToDemo}
     onVerify={auth.verify}
-    onOAuth={auth.showOAuthPlaceholder}
+    onOAuth={auth.oauthSignIn}
+    onUpdateProfile={auth.updateProfile}
+    onUpdateProfilePicture={auth.updateProfilePicture}
+    onRemoveProfilePicture={auth.removeProfilePicture}
     jobs={history.jobs}
     filteredJobs={history.filteredJobs}
     activeJob={history.activeJob}
@@ -57,10 +65,13 @@ function App() {
     onProviderConfigChange={providerSettings.setConfig}
     onSaveProviderConfig={providerSettings.save}
     onTestProviderConnection={providerSettings.testConnection}
+    workspaceName={providerSettings.workspaceName}
+    onSaveWorkspaceName={providerSettings.saveWorkspaceName}
     error={researchForm.error || history.error}
     onDismissError={dismissError}
     onSignOut={auth.signOut}
-  />;
+    />
+  </>;
 }
 
 export default App;

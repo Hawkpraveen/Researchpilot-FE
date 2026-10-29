@@ -17,7 +17,7 @@ export const researchDepthOptions: Array<{
   detail: string;
   tag: string;
 }> = [
-  { value: "quick", title: "Quick plan", detail: "Up to 3 tasks and 5 pages", tag: "Plan only" },
-  { value: "moderate", title: "Balanced plan", detail: "Up to 5 tasks and 15 pages", tag: "Recommended" },
-  { value: "deep", title: "Detailed plan", detail: "Up to 8 tasks and 30 pages", tag: "Largest budget" },
+  { value: "quick", title: "Quick research", detail: "Up to 3 tasks and 5 pages", tag: "Smallest budget" },
+  { value: "moderate", title: "Balanced research", detail: "Up to 5 tasks and 15 pages", tag: "Recommended" },
+  { value: "deep", title: "Deep research", detail: "Up to 8 tasks and 30 pages", tag: "Largest budget" },
 ];

@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { WorkspaceDialogState } from "./workspace.types";
 
-export function useWorkspaceManager() {
-  const [workspaces, setWorkspaces] = useState(["Personal workspace"]);
-  const [activeWorkspace, setActiveWorkspace] = useState("Personal workspace");
+export function useWorkspaceManager(initialWorkspaceName: string) {
+  const [workspaces, setWorkspaces] = useState([initialWorkspaceName]);
+  const [activeWorkspace, setActiveWorkspace] = useState(initialWorkspaceName);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dialog, setDialog] = useState<WorkspaceDialogState | null>(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setWorkspaces([initialWorkspaceName]);
+    setActiveWorkspace(initialWorkspaceName);
+  }, [initialWorkspaceName]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {

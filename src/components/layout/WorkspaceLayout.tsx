@@ -7,6 +7,7 @@ import { WorkspaceSidebar } from "../workspace/WorkspaceSidebar";
 
 export function WorkspaceLayout({
   session,
+  workspaceName,
   theme,
   jobs,
   activeJob,
@@ -23,12 +24,14 @@ export function WorkspaceLayout({
   const isNewResearch = location.pathname.endsWith("/research/new");
   const isReport = /^\/workspace\/research\/[^/]+$/.test(location.pathname) && !isNewResearch;
   const isSettings = location.pathname.endsWith("/settings");
-  const pageTitle = isNewResearch ? "New research" : isReport ? "Research report" : isSettings ? "Settings" : "Overview";
+  const isProfile = location.pathname.endsWith("/profile");
+  const pageTitle = isNewResearch ? "New research" : isReport ? "Research report" : isProfile ? "Profile settings" : isSettings ? "Settings" : "Overview";
 
   return (
     <div className={`app-shell theme-${theme}`}>
       <WorkspaceSidebar
         session={session}
+        workspaceName={workspaceName}
         jobs={jobs}
         activeJob={activeJob}
         loading={loading}

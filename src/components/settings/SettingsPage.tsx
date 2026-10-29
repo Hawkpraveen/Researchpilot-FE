@@ -1,47 +1,56 @@
-import { Activity, Check, CheckCircle2, Globe2, LoaderCircle, Settings2, ShieldCheck, Zap, X } from "lucide-react";
+import { Activity, ArrowUpRight, Check, CheckCircle2, ChevronDown, LoaderCircle, LockKeyhole, Settings2, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
 import type { SettingsProps } from "./settings.types";
 import { useSettingsForm } from "./useSettingsForm";
 import type { ProviderConfig } from "../../types";
+import { useState } from "react";
+import "./settings.css";
+import { WorkspaceNameSettings } from "./WorkspaceNameSettings";
 
-export function SettingsView({ config, connectionState, onChange, onSave, onTest }: SettingsProps) {
+export function SettingsView({ config, connectionState, onChange, onSave, onTest, workspaceName, onSaveWorkspaceName }: SettingsProps) {
   const { saving, update, save } = useSettingsForm(config, onChange, onSave);
-  const providerChoiceClass = (selected: boolean) => [
-    "grid grid-cols-[22px_1fr] gap-x-[9px] gap-y-[3px] rounded-[9px] border p-3.5 text-left text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7168df]",
-    "border-[#e6e7ec] bg-white text-[#7f8794] hover:border-[#c9c5f5] hover:bg-[#faf9ff] hover:text-[#5e55ce]",
-    "[.theme-dark_&]:border-[#34415a] [.theme-dark_&]:bg-[#111a2c] [.theme-dark_&]:text-[#b5bfd2]",
-    selected && "border-[#c9c5f5] bg-[#faf9ff] text-[#5e55ce] [.theme-dark_&]:border-[#756bd9] [.theme-dark_&]:bg-[#252444] [.theme-dark_&]:text-[#d2ccff]",
-  ].filter(Boolean).join(" ");
+  const availableModels = connectionState?.models ?? [];
+  const [manualModel, setManualModel] = useState(false);
+  const chooseAgent = (value: string) => {
+    const [mode, provider] = value.split(":") as [ProviderConfig["mode"], ProviderConfig["provider"]];
+    setManualModel(false);
+    if (provider === "ollama") update({ mode, provider, endpoint: "http://localhost:11434", model: "llama3.1", apiKey: "" });
+    else if (provider === "openai") update({ mode, provider, endpoint: "https://api.openai.com/v1", model: "", apiKey: "" });
+    else if (provider === "anthropic") update({ mode, provider, endpoint: "https://api.anthropic.com", model: "", apiKey: "" });
+    else update({ mode, provider, model: "", apiKey: "" });
+  };
 
   return (
-    <div className="settings-page mx-auto w-full max-w-900px">
-      <div className="eyebrow"><Settings2 size={14} /> WORKSPACE CONFIGURATION</div>
-      <h1 className="mb-2.5 mt-11px text-[31px] font-extrabold leading-tight tracking-[-1.6px] text-[#17202f] [.theme-dark_&]:text-[#edf2ff]">
-        Connect your research engine
-      </h1>
-      <p className="mb-6 max-w-650px text-[14px] leading-[1.8] text-[#7f8897] [.theme-dark_&]:text-[#a7b3c9]">
-        Run the agent locally with Ollama, or connect a server-side BYO key for OpenAI, Claude, or any OpenAI-compatible provider. Keys are sent only to the API when saved and are never stored in browser storage.
-      </p>
+    <div className="settings-page">
+      <div className="settings-hero">
+        <div>
+          <div className="eyebrow"><Settings2 size={14} /> WORKSPACE CONFIGURATION</div>
+          <h1>Connect your research engine</h1>
+          <p>Choose how ResearchPilot runs models, then verify the connection before you start a run.</p>
+        </div>
+        <div className="settings-hero-badge"><Sparkles size={16} /><span>Ready when you are</span></div>
+      </div>
 
-      <section className="form-card surface-card mb-4">
+      <div className="settings-layout">
+        <div className="settings-main">
+
+      <WorkspaceNameSettings workspaceName={workspaceName} onSave={onSaveWorkspaceName} />
+
+      <section className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><Zap size={15} /></span>
-          <div><h2>Execution mode</h2><p>Choose where research models run.</p></div>
+          <div><h2>Research agent</h2><p>Choose which provider will run research.</p></div>
         </div>
-        <div className="provider-toggle mt-4 grid grid-cols-1 gap-2.5 min-[761px]:grid-cols-2">
-          <button className={providerChoiceClass(config.mode === "local")} aria-pressed={config.mode === "local"} onClick={() => update({ mode: "local", provider: "ollama", endpoint: "http://localhost:11434", model: "llama3.1" })}>
-            <Globe2 className="row-span-2 mt-0.5" size={17} />
-            <strong className="text-[14px] text-[#465061] [.theme-dark_&]:text-[#edf2ff]">Local agent</strong>
-            <small className="text-[14px] text-[#949ba7] [.theme-dark_&]:text-[#9eabc0]">Ollama on this machine</small>
-          </button>
-          <button className={providerChoiceClass(config.mode === "byok")} aria-pressed={config.mode === "byok"} onClick={() => update({ mode: "byok" })}>
-            <ShieldCheck className="row-span-2 mt-0.5" size={17} />
-            <strong className="text-[14px] text-[#465061] [.theme-dark_&]:text-[#edf2ff]">Bring your own key</strong>
-            <small className="text-[14px] text-[#949ba7] [.theme-dark_&]:text-[#9eabc0]">OpenAI, Claude, or custom</small>
-          </button>
-        </div>
+        <label className="field-label mt-4" htmlFor="research-agent">Agent / provider
+          <select id="research-agent" value={`${config.mode}:${config.provider}`} onChange={(event) => chooseAgent(event.target.value)}>
+            <option value="local:ollama">Ollama (local)</option>
+            <option value="byok:openai">OpenAI</option>
+            <option value="byok:anthropic">Anthropic Claude</option>
+            <option value="byok:custom">Custom OpenAI-compatible</option>
+          </select>
+        </label>
       </section>
 
-      <section className="form-card surface-card mb-4">
+      <section className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><Activity size={15} /></span>
           <div>
@@ -49,25 +58,22 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
             <p>{config.mode === "local" ? "The API should reach Ollama through the local agent service." : "The browser never calls model providers directly."}</p>
           </div>
         </div>
-        {config.mode === "byok" && (
-          <label className="field-label" htmlFor="provider">
-            Provider
-            <select id="provider" value={config.provider} onChange={(event) => update({ provider: event.target.value as ProviderConfig["provider"] })}>
-              <option value="openai">OpenAI</option>
-              <option value="anthropic">Claude (Anthropic)</option>
-              <option value="custom">Custom OpenAI-compatible</option>
-            </select>
-          </label>
-        )}
         <div className="settings-fields grid grid-cols-1 gap-3 min-[761px]:grid-cols-2">
           <label className="field-label" htmlFor="endpoint">
             API endpoint
             <input id="endpoint" value={config.endpoint} onChange={(event) => update({ endpoint: event.target.value })} placeholder="http://localhost:11434" />
           </label>
-          <label className="field-label" htmlFor="model">
-            Model
-            <input id="model" value={config.model} onChange={(event) => update({ model: event.target.value })} placeholder={config.provider === "anthropic" ? "claude-sonnet-4-5" : "gpt-4.1-mini"} />
-          </label>
+          <div className="field-label model-picker-label">Model
+            <details className="model-picker">
+              <summary>{manualModel ? "Enter a model manually…" : config.model || "Choose a model"}<ChevronDown size={15} /></summary>
+              <div className="model-picker-options" role="listbox" aria-label="Available models">
+                {!availableModels.includes(config.model) && <span className="model-picker-empty">{config.model ? `Current model: ${config.model} · test to check availability` : "Test this agent to load available models."}</span>}
+                {availableModels.map((model) => <button type="button" role="option" aria-selected={model === config.model && !manualModel} key={model} onClick={(event) => { setManualModel(false); update({ model }); event.currentTarget.closest("details")?.removeAttribute("open"); }}>{model}</button>)}
+                <button type="button" role="option" aria-selected={manualModel} onClick={(event) => { setManualModel(true); update({ model: "" }); event.currentTarget.closest("details")?.removeAttribute("open"); }}>Enter a model manually…</button>
+              </div>
+            </details>
+          </div>
+          {manualModel && <label className="field-label" htmlFor="model">Custom model ID<input id="model" value={config.model} onChange={(event) => update({ model: event.target.value })} placeholder="Enter a model ID" /></label>}
         </div>
         {config.mode === "byok" && (
           <label className="field-label" htmlFor="api-key">
@@ -76,40 +82,63 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
           </label>
         )}
         <div className="mt-4 flex justify-end gap-2 border-t border-[#eff0f4] pt-4 [.theme-dark_&]:border-[#25324a] max-[760px]:flex-col max-[760px]:[&>button]:w-full">
-          <button className="secondary-button" onClick={onTest}><Activity size={15} /> Test connection</button>
+          <button className="secondary-button" onClick={onTest}><Activity size={15} /> Test current configuration</button>
           <button className="primary-button" onClick={save} disabled={saving}>
             {saving ? <><LoaderCircle size={15} className="spin" /> Saving…</> : <><Check size={15} /> Save configuration</>}
           </button>
         </div>
         {connectionState && (
-          <div className={`mt-3 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[14px] ${connectionState.connected
+          <div className={`mt-3 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] ${connectionState.connected
             ? "bg-[#eaf8f1] text-[#16815c] [.theme-dark_&]:bg-[#143328] [.theme-dark_&]:text-[#70d5ac]"
             : "bg-[#fff0f1] text-[#b34d57] [.theme-dark_&]:bg-[#3a202b] [.theme-dark_&]:text-[#ff9fa8]"}`}>
             <span className="status-dot" />{connectionState.message}
           </div>
         )}
+        <p className="provider-test-note">Testing uses these current selections and any saved key for the same provider and endpoint. It does not save your changes.</p>
       </section>
 
-      <section className="form-card surface-card mb-4">
+      <section className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><ShieldCheck size={15} /></span>
           <div><h2>Safety defaults</h2><p>These controls stay enabled for every provider.</p></div>
         </div>
         <div className="flex items-center justify-between gap-4 border-t border-[#eff0f4] py-3.5 [.theme-dark_&]:border-[#25324a] max-[480px]:items-start max-[480px]:flex-col">
           <div className="flex flex-col gap-1.5">
-            <strong className="text-[14px] text-[#17202f] [.theme-dark_&]:text-[#edf2ff]">Evidence-first reporting</strong>
-            <span className="text-[14px] leading-[1.6] text-[#929aa7] [.theme-dark_&]:text-[#a7b3c9]">Claims, sources, gaps, and conflicts stay visible in every report.</span>
+            <strong className="text-[12px] text-[#17202f] [.theme-dark_&]:text-[#edf2ff]">Evidence-first reporting</strong>
+            <span className="text-[12px] leading-[1.6] text-[#929aa7] [.theme-dark_&]:text-[#a7b3c9]">Claims, sources, gaps, and conflicts stay visible in every report.</span>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[14px] font-bold text-[#16815c] [.theme-dark_&]:text-[#70d5ac]"><CheckCircle2 size={14} /> Enabled</span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[12px] font-bold text-[#16815c] [.theme-dark_&]:text-[#70d5ac]"><CheckCircle2 size={14} /> Enabled</span>
         </div>
         <div className="flex items-center justify-between gap-4 border-t border-[#eff0f4] py-3.5 [.theme-dark_&]:border-[#25324a] max-[480px]:items-start max-[480px]:flex-col">
           <div className="flex flex-col gap-1.5">
-            <strong className="text-[14px] text-[#17202f] [.theme-dark_&]:text-[#edf2ff]">Automatic paid fallback</strong>
-            <span className="text-[14px] leading-[1.6] text-[#929aa7] [.theme-dark_&]:text-[#a7b3c9]">ResearchPilot never switches providers without explicit configuration.</span>
+            <strong className="text-[12px] text-[#17202f] [.theme-dark_&]:text-[#edf2ff]">Automatic paid fallback</strong>
+            <span className="text-[12px] leading-[1.6] text-[#929aa7] [.theme-dark_&]:text-[#a7b3c9]">ResearchPilot never switches providers without explicit configuration.</span>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[14px] font-bold text-[#a1a7b2]"><X size={14} /> Disabled</span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[12px] font-bold text-[#a1a7b2]"><X size={14} /> Disabled</span>
         </div>
       </section>
+        </div>
+
+        <aside className="settings-rail">
+          <section className="settings-status-card">
+            <div className="settings-status-heading"><span className="settings-status-icon"><Activity size={16} /></span><span><strong>Connection status</strong><small>Current workspace setup</small></span></div>
+            <div className={`settings-status-value ${connectionState?.connected ? "is-connected" : ""}`}><span className="status-dot" />{connectionState?.connected ? "Connected" : "Not tested yet"}</div>
+            <p>{connectionState?.message ?? "Run a connection test to confirm that your selected provider is reachable."}</p>
+            <button className="settings-rail-link" type="button" onClick={onTest}>Test connection <ArrowUpRight size={14} /></button>
+          </section>
+          <section className="settings-note-card">
+            <div className="settings-note-icon"><LockKeyhole size={16} /></div>
+            <strong>Your key stays private</strong>
+            <p>Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API.</p>
+          </section>
+          <section className="settings-help-card">
+            <span className="nav-label">QUICK GUIDE</span>
+            <div><span>1</span><p>Pick local or BYO key</p></div>
+            <div><span>2</span><p>Enter the endpoint and model</p></div>
+            <div><span>3</span><p>Test, then save</p></div>
+          </section>
+        </aside>
+      </div>
     </div>
   );
 }

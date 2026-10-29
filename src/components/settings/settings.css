@@ -1,0 +1,42 @@
+/* Settings page styles live with the settings feature. */
+.settings-page { @apply [width:100%] [max-width:1180px] [margin:0_auto]; }
+.settings-hero { @apply [display:flex] [align-items:flex-end] [justify-content:space-between] [gap:24px] [margin:4px_0_24px] [padding:0_4px]; }
+.settings-hero h1 { @apply [margin:12px_0_8px] [color:var(--ink)] [font:800_clamp(28px,_3vw,_38px)/1.12_Manrope,_sans-serif] [letter-spacing:-1.6px]; }
+.settings-hero p { @apply [max-width:650px] [margin:0] [color:var(--muted)] [font-size:12px] [line-height:1.75]; }
+.settings-hero-badge { @apply [display:flex] [align-items:center] [gap:8px] [flex-shrink:0] [padding:9px_12px] [border:1px_solid_#dddafe] [border-radius:999px] [color:#5f56c9] [background:#f8f7ff] [font-size:12px] [font-weight:700]; }
+.settings-layout { @apply [display:grid] [grid-template-columns:minmax(0,_1fr)_285px] [align-items:start] [gap:18px]; }
+.settings-main { @apply [display:flex] [flex-direction:column] [gap:14px] [min-width:0]; }
+.settings-card { @apply [margin:0] [padding:25px] [border-radius:16px]; }
+.settings-card .form-section-title { @apply [margin-bottom:21px]; }
+.settings-card .field-label input, .settings-card .field-label select { @apply [display:block] [width:100%] [height:43px] [margin-top:8px] [padding:0_12px] [border:1px_solid_var(--line)] [border-radius:9px] [outline:none] [color:var(--ink)] [background:var(--panel)] [font-size:12px] [transition:border_.15s,_box-shadow_.15s]; }
+.settings-card .field-label input:focus, .settings-card .field-label select:focus { @apply [border-color:#8f87ed] [box-shadow:0_0_0_3px_#635bdb1a]; }
+.settings-card .field-label select { @apply [padding:0_11px]; }
+.settings-card .provider-toggle button { @apply [min-height:73px] [border-radius:11px] [transition:transform_.15s,_border-color_.15s,_background_.15s]; }
+.settings-card .provider-toggle button:hover { @apply [transform:translateY(-1px)]; }
+.settings-rail { @apply [display:flex] [flex-direction:column] [gap:14px] [position:sticky] [top:80px]; }
+.settings-status-card, .settings-note-card, .settings-help-card { @apply [border:1px_solid_var(--line)] [border-radius:16px] [background:var(--panel)] [box-shadow:var(--shadow)]; }
+.settings-status-card { @apply [padding:18px]; }
+.settings-status-heading { @apply [display:flex] [align-items:center] [gap:10px]; }
+.settings-status-heading > span:last-child { @apply [display:flex] [flex-direction:column] [gap:3px]; }
+.settings-status-heading strong, .settings-note-card strong { @apply [color:var(--ink)] [font-size:12px] [font-weight:800]; }
+.settings-status-heading small { @apply [color:var(--muted)] [font-size:12px]; }
+.settings-status-icon, .settings-note-icon { @apply [display:grid] [place-items:center] [width:33px] [height:33px] [border-radius:10px] [color:#6259d5] [background:#efedff]; }
+.settings-status-value { @apply [display:flex] [align-items:center] [gap:8px] [margin-top:22px] [color:#a66b12] [font-size:12px] [font-weight:800]; }
+.settings-status-value.is-connected { @apply [color:var(--green)]; }
+.settings-status-card p, .settings-note-card p { @apply [margin:8px_0_0] [color:var(--muted)] [font-size:12px] [line-height:1.65]; }
+.settings-rail-link { @apply [display:inline-flex] [align-items:center] [gap:6px] [margin-top:15px] [padding:0] [border:0] [color:#5e55ce] [background:transparent] [font-size:12px] [font-weight:800]; }
+.settings-rail-link:hover { @apply [color:#4239b8]; }
+.settings-note-card { @apply [padding:17px] [background:linear-gradient(145deg,_#fbfaff,_#f4f7ff)]; }
+.settings-note-icon { @apply [margin-bottom:13px] [color:#16815c] [background:#e9f8f1]; }
+.settings-help-card { @apply [display:flex] [flex-direction:column] [gap:13px] [padding:17px]; }
+.settings-help-card .nav-label { @apply [padding:0] [font-size:11px]; }
+.settings-help-card > div { @apply [display:flex] [align-items:center] [gap:10px]; }
+.settings-help-card > div > span { @apply [display:grid] [place-items:center] [width:23px] [height:23px] [flex-shrink:0] [border-radius:7px] [color:#5f56c9] [background:#efedff] [font-size:12px] [font-weight:800]; }
+.settings-help-card p { @apply [margin:0] [color:var(--muted)] [font-size:12px]; }
+html[data-theme="dark"] .settings-hero-badge { @apply [border-color:#403d70] [color:#c7c1ff] [background:#211f3d]; }
+html[data-theme="dark"] .settings-status-icon { @apply [color:#d9d5ff] [background:#28264c]; }
+html[data-theme="dark"] .settings-note-card { @apply [background:linear-gradient(145deg,_#171d38,_#151f34)]; }
+html[data-theme="dark"] .settings-note-icon { @apply [color:#70d5ac] [background:#143328]; }
+html[data-theme="dark"] .settings-help-card > div > span { @apply [color:#d9d5ff] [background:#28264c]; }
+@media (max-width: 920px) { .settings-layout { @apply [grid-template-columns:1fr]; } .settings-rail { @apply [display:grid] [grid-template-columns:repeat(2,_minmax(0,_1fr))] [position:static]; } .settings-help-card { @apply [grid-column:1/-1]; } }
+@media (max-width: 560px) { .settings-hero { @apply [align-items:flex-start] [flex-direction:column]; } .settings-hero-badge { @apply [display:none]; } .settings-card { @apply [padding:18px]; } .settings-rail { @apply [display:flex]; } }

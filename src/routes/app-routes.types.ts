@@ -3,6 +3,7 @@ import type { AuthSession, CreateResearchRequest, ProviderConfig, ResearchJob } 
 
 export interface AppRoutesProps {
   session: AuthSession | null;
+  authInitializing: boolean;
   theme: "light" | "dark";
   authLoading: boolean;
   authError: string;
@@ -10,10 +11,12 @@ export interface AppRoutesProps {
   onToggleTheme: () => void;
   onAuthModeChange: (mode: "signin" | "signup") => void;
   onSignIn: (email: string, password: string) => Promise<void>;
-  onSignUp: (name: string, email: string, password: string) => Promise<void>;
-  onDemoLogin: () => Promise<void>;
+  onSignUp: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   onVerify: (code: string) => Promise<void>;
-  onOAuth: (provider: "google" | "microsoft" | "github") => void;
+  onOAuth: (provider: "google" | "microsoft", idToken: string) => Promise<void>;
+  onUpdateProfile: (firstName: string, lastName: string) => Promise<void>;
+  onUpdateProfilePicture: (file: Blob) => Promise<void>;
+  onRemoveProfilePicture: () => Promise<void>;
   jobs: ResearchJob[];
   filteredJobs: ResearchJob[];
   activeJob: ResearchJob | null;
@@ -34,6 +37,8 @@ export interface AppRoutesProps {
   onProviderConfigChange: (config: ProviderConfig) => void;
   onSaveProviderConfig: () => Promise<void>;
   onTestProviderConnection: () => Promise<void>;
+  workspaceName: string;
+  onSaveWorkspaceName: (name: string) => Promise<void>;
   error: string;
   onDismissError: () => void;
   onSignOut: () => Promise<void>;

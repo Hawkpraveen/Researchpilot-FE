@@ -1,38 +1,15 @@
 import type { AuthSession, AuthUser } from "../types";
-import { clearAccessToken, getAccessToken, setAccessToken } from "./authToken";
+import { clearaccess_token, getaccess_token, setaccess_token } from "./authToken";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:5000/api/v1";
-const DEMO_MODE = (import.meta.env.VITE_DEMO_MODE as string | undefined) !== "false";
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-  });
-  if (!response.ok) {
-    const body: unknown = await response.json().catch(() => null);
-    const message = typeof body === "object" && body !== null
-      && "error" in body && typeof body.error === "object" && body.error !== null
-      && "message" in body.error && typeof body.error.message === "string"
-      ? body.error.message
-      : `Request failed (${response.status})`;
-    throw new Error(message);
-  }
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
-}
+import { ApiError, request } from "./apiClient";
+export { ApiError } from "./apiClient";
 
 async function createSession(path: string, input?: unknown): Promise<AuthSession> {
   const session = await request<AuthSession>(path, {
     method: "POST",
     ...(input === undefined ? {} : { body: JSON.stringify(input) }),
   });
-  setAccessToken(session.accessToken);
+  setaccess_token(session.access_token);
   return session;
 }
 
@@ -40,23 +17,23 @@ export function signIn(email: string, password: string) {
   return createSession("/auth/login", { email, password });
 }
 
-export function signUp(name: string, email: string, password: string) {
-  return createSession("/auth/register", { name, email, password });
-}
-
-export async function signInDemo(): Promise<AuthSession> {
-  if (!DEMO_MODE) throw new Error("Demo login is only available in demo mode.");
-  return createSession("/auth/demo");
+export function signUp(firstName: string, lastName: string, email: string, password: string) {
+  return createSession("/auth/register", {
+    first_name: firstName.trim(),
+    last_name: lastName.trim(),
+    email,
+    password,
+  });
 }
 
 export async function getCurrentSession(): Promise<AuthSession | null> {
-  if (!getAccessToken()) return null;
+  if (!getaccess_token()) return null;
   try {
     const user = await request<AuthUser>("/auth/me");
-    return { user, accessToken: getAccessToken() ?? "" };
+    return { user, access_token: getaccess_token() ?? "" };
   } catch (error) {
-    if (error instanceof Error && error.message === "Your session is invalid or has expired.") {
-      clearAccessToken();
+    if (error instanceof ApiError && error.status === 401) {
+      clearaccess_token();
       return null;
     }
     throw error;
@@ -65,9 +42,9 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
 
 export async function signOut() {
   try {
-    if (getAccessToken()) await request<void>("/auth/logout", { method: "POST" });
+    if (getaccess_token()) await request<void>("/auth/logout", { method: "POST" });
   } finally {
-    clearAccessToken();
+    clearaccess_token();
   }
 }
 
@@ -76,12 +53,31 @@ export async function verifyTwoFactor(challengeId: string, code: string): Promis
     method: "POST",
     body: JSON.stringify({ challengeId, code }),
   });
-  setAccessToken(session.accessToken);
+  setaccess_token(session.access_token);
   return session;
 }
 
-export function getOAuthUrl(provider: "google" | "microsoft" | "github") {
-  return `${API_BASE_URL}/auth/${provider}`;
+export async function signInWithOAuth(provider: "google" | "microsoft", idToken: string): Promise<AuthSession> {
+  return createSession(`/auth/${provider}`, { id_token: idToken });
+}
+
+export async function updateProfile(firstName: string, lastName: string): Promise<AuthUser> {
+  return request<AuthUser>("/auth/profile", {
+    method: "PUT",
+    body: JSON.stringify({ first_name: firstName.trim(), last_name: lastName.trim() }),
+  });
+}
+
+export async function uploadProfilePicture(file: Blob): Promise<AuthUser> {
+  return request<AuthUser>("/auth/profile/avatar", {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+}
+
+export async function deleteProfilePicture(): Promise<AuthUser> {
+  return request<AuthUser>("/auth/profile/avatar", { method: "DELETE" });
 }
 
 export async function requestPhoneCode(phone: string): Promise<void> {

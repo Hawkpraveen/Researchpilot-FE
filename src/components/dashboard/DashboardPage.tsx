@@ -77,19 +77,19 @@ export function Dashboard({ jobs, loading, activeJob, query, onQueryChange, onNe
 
       <section className="bottom-grid">
         <div className="workflow-card surface-card">
-          <div className="section-heading compact"><div><h2>Workflow status</h2><p>Planning works now; search and evidence checks are still being built.</p></div><span className="mini-badge"><ShieldCheck size={13} /> Plan only</span></div>
+          <div className="section-heading compact"><div><h2>Workflow status</h2><p>Plan, search the web, and build a report with cited source excerpts.</p></div><span className="mini-badge"><ShieldCheck size={13} /> Web research</span></div>
           <div className="workflow-steps">
             <WorkflowStep number="01" icon={<Target size={16} />} title="Plan" detail="Break down your question" />
             <ArrowRight className="workflow-arrow" size={15} />
-            <WorkflowStep number="02" icon={<Globe2 size={16} />} title="Research" detail="Not run yet" />
+            <WorkflowStep number="02" icon={<Globe2 size={16} />} title="Research" detail="Retrieve source content" />
             <ArrowRight className="workflow-arrow" size={15} />
-            <WorkflowStep number="03" icon={<ShieldCheck size={16} />} title="Verify" detail="Not run yet" />
+            <WorkflowStep number="03" icon={<ShieldCheck size={16} />} title="Verify" detail="Retrieve source content" />
             <ArrowRight className="workflow-arrow" size={15} />
             <WorkflowStep number="04" icon={<FileText size={16} />} title="Decide" detail="Build your report" />
           </div>
         </div>
         <div className="continue-card surface-card">
-          <div className="continue-icon"><Clock3 size={18} /></div><div className="continue-content"><span className="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h3>{activeJob?.title ?? "Your next decision starts here"}</h3><p>{activeJob ? `${activeJob.sourceCount} sources · ${statusLabel(activeJob.status)}` : "Start a bounded research plan. Evidence-backed reports are not available yet."}</p></div>
+          <div className="continue-icon"><Clock3 size={18} /></div><div className="continue-content"><span className="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h3>{activeJob?.title ?? "Your next decision starts here"}</h3><p>{activeJob ? `${activeJob.sourceCount} sources · ${statusLabel(activeJob.status)}` : "Start a research run using your configured model and web search."}</p></div>
           {activeJob?.status === "completed" ? <button className="icon-button bordered" aria-label="Open latest report" onClick={onViewReport}><ArrowRight size={17} /></button> : <button className="icon-button bordered" aria-label="Continue research" onClick={onRetry}><ArrowRight size={17} /></button>}
         </div>
       </section>

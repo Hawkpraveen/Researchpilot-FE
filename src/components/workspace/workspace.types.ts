@@ -5,6 +5,7 @@ export type WorkspaceDialogState = { mode: "create" | "edit" | "delete"; workspa
 
 export interface WorkspaceSidebarProps {
   session: AuthSession;
+  workspaceName: string;
   jobs: ResearchJob[];
   activeJob: ResearchJob | null;
   loading: boolean;
@@ -16,6 +17,7 @@ export interface WorkspaceSidebarProps {
 
 export interface WorkspaceLayoutProps {
   session: AuthSession;
+  workspaceName: string;
   theme: "light" | "dark";
   jobs: ResearchJob[];
   activeJob: ResearchJob | null;
