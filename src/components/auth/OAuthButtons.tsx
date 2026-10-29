@@ -135,17 +135,15 @@ export function OAuthButtons({
     <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-2">
       {googleConfigured
         ? <div ref={googleButton} className={`oauth-google-button ${loading ? "oauth-button-loading" : ""}`} aria-label="Continue with Google" />
-        : <button type="button" className="oauth-provider-placeholder" disabled title="Configure VITE_GOOGLE_CLIENT_ID to enable Google sign-in"><span className="oauth-provider-g">G</span>Google</button>}
+        : <button type="button" className="oauth-provider-placeholder" disabled title="Google sign-in is unavailable"><span className="oauth-provider-g">G</span>Google</button>}
       <button
         className="oauth-provider-placeholder microsoft-provider"
         type="button"
         onClick={() => void signInMicrosoft()}
         disabled={loading || microsoftWorking || !microsoftConfigured}
-        title={microsoftConfigured ? "Continue with Microsoft" : "Configure VITE_MICROSOFT_CLIENT_ID to enable Microsoft sign-in"}
+        title={microsoftConfigured ? "Continue with Microsoft" : "Microsoft sign-in is unavailable"}
       ><span className="microsoft-logo" aria-hidden="true"><i /><i /><i /><i /></span><span>{microsoftWorking ? "Connecting…" : "Microsoft"}</span></button>
     </div>
     {(googleError || microsoftError) && <p className="oauth-error" role="alert">{googleError || microsoftError}</p>}
-    {(!googleConfigured || !microsoftConfigured) && <p className="oauth-setup-note">Add the provider client IDs to the frontend and matching backend environment variables to enable sign-in.</p>}
-    {googleConfigured && <p className="oauth-setup-note">Google OAuth must allow {window.location.origin} as a JavaScript origin. Register {window.location.origin}/redirect.html as the Microsoft SPA redirect URI.</p>}
   </div>;
 }
