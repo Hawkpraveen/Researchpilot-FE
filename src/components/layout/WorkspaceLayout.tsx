@@ -1,3 +1,4 @@
+import "./layout.styles.css";
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AlertCircle, Menu, Moon, Sun, X } from "lucide-react";

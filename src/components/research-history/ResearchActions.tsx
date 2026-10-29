@@ -1,7 +1,7 @@
+import "./research-history.styles.css";
 import { useEffect, useId, useRef, useState } from "react";
 import { LoaderCircle, Pencil, Trash2, X } from "lucide-react";
 import type { ResearchJob } from "../../types";
-import "./research-actions.css";
 
 export interface ResearchActionsProps {
   job: ResearchJob;

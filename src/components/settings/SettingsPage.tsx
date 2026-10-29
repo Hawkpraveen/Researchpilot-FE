@@ -1,9 +1,9 @@
+import "./settings.styles.css";
 import { Activity, ArrowUpRight, Check, CheckCircle2, ChevronDown, LoaderCircle, LockKeyhole, Settings2, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
 import type { SettingsProps } from "./settings.types";
 import { useSettingsForm } from "./useSettingsForm";
 import type { ProviderConfig } from "../../types";
 import { useState } from "react";
-import "./settings.css";
 import { WorkspaceNameSettings } from "./WorkspaceNameSettings";
 
 export function SettingsView({ config, connectionState, onChange, onSave, onTest, workspaceName, onSaveWorkspaceName }: SettingsProps) {

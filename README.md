@@ -16,7 +16,11 @@ OAuth providers, phone OTP, and 2FA are UI placeholders and are not enabled.
 - `src/components/layout/` contains the shared authenticated workspace shell.
 - `src/services/` contains API adapters; `src/types.ts` contains shared domain types.
 
-Tailwind CSS v4 is integrated with the Vite plugin and is used across the full app. Component styles in `src/styles.css` are composed from Tailwind utilities with `@apply`, including arbitrary-property utilities for design values that do not have a built-in token. Keep theme variables and keyframe animations in CSS; add new screen styling as Tailwind utilities in the component or as Tailwind `@apply` rules rather than writing standalone CSS declarations. The shared surface utility also lives in `src/styles.css`.
+Tailwind CSS v4 is integrated with the Vite plugin. `src/styles.css` contains global resets, theme tokens, and reusable controls. It is imported once, before the application, by `main.tsx`.
+
+Keep feature rules in `src/components/<feature>/<feature>.styles.css` (for example, `auth/auth.styles.css`), imported by that feature's component. Keep its responsive rules, dark-theme overrides, and animations in the same file. Shared classes such as `.primary-button`, `.field-label`, and `.surface-card` belong in `src/styles.css`; reuse those classes instead of copying their definitions into feature files. Continue using component Tailwind utilities or `@apply` for new UI styling.
+
+Start each feature stylesheet with `@reference "tailwindcss"` so its `@apply` rules can resolve Tailwind utilities without emitting another copy of Tailwind. Import it from the feature's TSX entry point, not from the global stylesheet as well. Existing feature CSS files have been consolidated into the corresponding `.styles.css` files. Before adding a rule, check the shared stylesheet and the feature file for an existing definition; intentional state, theme, and viewport overrides should remain beside their base component rule.
 
 Project-specific setup, UI contracts, local ports, and planned backend integration are documented in [Documents/ResearchPilot-UI-Contract.md](./Documents/ResearchPilot-UI-Contract.md).
 

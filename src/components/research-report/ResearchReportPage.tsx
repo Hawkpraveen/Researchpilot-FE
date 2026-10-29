@@ -1,8 +1,8 @@
+import "./research-report.styles.css";
 import { useRef } from "react";
 import { AlertCircle, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, CheckCircle2, Clock3, Filter, Globe2, Link2, Plus, ShieldCheck, Target } from "lucide-react";
 import type { ResearchReportProps, ResearchReportTab } from "./research-report.types";
 import { CitedText } from "./CitedText";
-import "./research-report.css";
 import { ResearchActions } from "../research-history/ResearchActions";
 
 function formatSourceDate(value: string) {

@@ -1,0 +1,316 @@
+@reference "tailwindcss";
+
+/* layout component styles, including responsive and theme variants. */
+
+@media (min-width: 1100px) and (min-height: 650px) {
+  .app-shell:has(.dashboard-page) > .main-area {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .app-shell:has(.dashboard-page) .topbar {
+    flex-shrink: 0;
+  }
+  .main-area > .page-content:has(> .dashboard-page) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+    padding-top: 22px;
+    padding-bottom: 18px;
+  }
+  .page-content:has(> .dashboard-page) > .alert-banner {
+    flex-shrink: 0;
+  }
+}
+
+.page-content:has(.research-wizard) {
+  padding-top: 18px;
+}
+
+@media (min-width: 761px) {
+  .page-content:has(.research-wizard) {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 62px);
+    padding-top: 14px;
+    padding-bottom: 14px;
+    min-height: 0;
+  }
+  .page-content:has(.research-wizard) > .alert-banner {
+    flex-shrink: 0;
+  }
+}
+
+.page-content:has(> .report-shell) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 62px);
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .page-content:has(> .report-shell) {
+    height: calc(100dvh - 57px);
+  }
+}
+
+.app-shell {
+  @apply [min-height:100vh];
+}
+
+.mobile-menu {
+  @apply [display:none];
+}
+
+.main-area {
+  @apply [min-height:100vh] [margin-left:252px];
+}
+
+.topbar {
+  @apply [position:sticky] [top:0] [z-index:10] [display:flex] [align-items:center] [justify-content:space-between] [height:62px] [padding:0_38px] [border-bottom:1px_solid_var(--line)] [background:rgba(255,255,255,.93)] [backdrop-filter:blur(12px)];
+}
+
+.breadcrumbs,
+.topbar-actions {
+  @apply [display:flex] [align-items:center] [gap:12px];
+}
+
+.breadcrumbs {
+  @apply [color:#8b93a1] [font-size:12px];
+}
+
+.breadcrumbs strong {
+  @apply [color:#343d4d] [font-weight:700];
+}
+
+.crumb-separator {
+  @apply [color:#c4c8d0];
+}
+
+.topbar-actions {
+  @apply [gap:16px];
+}
+
+.environment-badge {
+  @apply [display:flex] [align-items:center] [gap:6px] [padding:6px_9px] [border:1px_solid_#e5e8ed] [border-radius:20px] [color:#717b8a] [background:#fff] [font-size:12px];
+}
+
+.environment-badge > span {
+  @apply [width:6px] [height:6px] [border-radius:50%] [background:#dba23c];
+}
+
+.page-content {
+  @apply [max-width:1420px] [margin:0_auto] [padding:31px_38px_18px];
+}
+
+.page-footer {
+  @apply [display:flex] [align-items:center] [justify-content:space-between] [gap:15px] [margin-top:26px] [padding:16px_0_0] [border-top:1px_solid_#e9ebf0] [color:#a2a8b3] [font-size:12px];
+}
+
+.page-footer > span:last-child {
+  @apply [display:inline-flex] [align-items:center] [gap:5px];
+}
+
+.footer-dot {
+  @apply [padding:0_3px] [color:#c1c5ce];
+}
+
+.mobile-scrim {
+  @apply [display:none];
+}
+
+@media (max-width: 1200px) {
+  .main-area {
+    @apply [margin-left:230px];
+  }
+  .page-content {
+    @apply [padding-right:25px] [padding-left:25px];
+  }
+  .topbar {
+    @apply [padding:0_25px];
+  }
+}
+
+@media (max-width: 760px) {
+  .mobile-menu {
+    @apply [display:inline-grid];
+  }
+  .mobile-scrim {
+    @apply [position:fixed] [inset:0] [display:block] [z-index:19] [border:0] [background:#17202f55];
+  }
+  .main-area {
+    @apply [margin-left:0];
+  }
+  .topbar {
+    @apply [height:57px] [padding:0_15px];
+  }
+  .breadcrumbs {
+    @apply [gap:8px];
+  }
+  .topbar-actions {
+    @apply [gap:8px];
+  }
+  .environment-badge {
+    @apply [font-size:12px];
+  }
+  .page-content {
+    @apply [padding:22px_15px_16px];
+  }
+  .page-footer {
+    @apply [align-items:flex-start] [flex-direction:column] [gap:7px];
+  }
+}
+
+@media (max-width: 390px) {
+  .environment-badge {
+    @apply [display:none];
+  }
+}
+
+.theme-dark .topbar {
+  @apply [border-color:var(--line)] [background:#121b2d];
+}
+
+.theme-dark .main-area,
+.theme-dark .page-content {
+  @apply [background:#0b1220];
+}
+
+.theme-dark .topbar {
+  @apply [background:#10192a];
+}
+
+.theme-dark .page-footer {
+  @apply [border-color:#202d43] [color:#9eabc0];
+}
+
+.app-shell {
+  @apply [min-height:100vh] [transition:background-color_.2s_ease,_color_.2s_ease];
+}
+
+.theme-dark .breadcrumbs strong {
+  @apply [color:#edf2ff];
+}
+
+.theme-dark .breadcrumbs {
+  @apply [color:#a7b3c9];
+}
+
+.theme-dark .environment-badge {
+  @apply [border-color:var(--line)] [color:#d7deec] [background:#172238];
+}
+
+.theme-dark .page-footer {
+  @apply [color:#9eabc0];
+}
+
+.topbar-actions {
+  @apply [gap:12px];
+}
+
+.app-shell:has(> .workspace-navigation) {
+  --rail-width: 64px;
+  --workspace-panel-width: 276px;
+}
+
+.app-shell:has(> .global-expanded) {
+  --rail-width: 184px;
+}
+
+.app-shell:has(> .workspace-collapsed) {
+  --workspace-panel-width: 0px;
+}
+
+.topbar-projects-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.topbar-projects-button:hover {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+@container (max-width: 700px) {
+  .topbar {
+    padding-inline: 16px;
+    gap: 12px;
+  }
+  .environment-badge {
+    display: none;
+  }
+  .breadcrumbs {
+    min-width: 0;
+    gap: 8px;
+  }
+  .breadcrumbs strong {
+    overflow-wrap: anywhere;
+  }
+  .topbar-actions {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .page-content {
+    padding-inline: 16px;
+    min-width: 0;
+  }
+  .page-content:has(> .report-shell) {
+    display: block;
+    height: auto;
+  }
+}
+
+@container (max-width: 400px) {
+  .topbar {
+    padding: 8px 10px;
+    gap: 6px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 57px;
+  }
+  .topbar-projects-button {
+    padding-inline: 7px;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .topbar-actions {
+    gap: 2px;
+    margin-left: auto;
+  }
+  .breadcrumbs > .hidden {
+    display: none;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .app-shell:has(> .workspace-navigation:not(.workspace-collapsed)) {
+    --workspace-panel-width: 248px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell:has(> .global-expanded) {
+    --rail-width: 136px;
+  }
+  .app-shell:has(> .workspace-navigation:not(.workspace-collapsed)) {
+    --workspace-panel-width: min(276px, calc(100vw - var(--rail-width) - 16px));
+  }
+}

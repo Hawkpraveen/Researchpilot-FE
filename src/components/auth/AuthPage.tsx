@@ -1,3 +1,4 @@
+import "./auth.styles.css";
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, KeyRound, LoaderCircle, Moon, ShieldCheck, Sparkles, Sun } from "lucide-react";
 import type { AuthPageProps } from "./auth.types";
 import { useAuthForm } from "./useAuthForm";

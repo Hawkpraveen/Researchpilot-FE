@@ -1,8 +1,8 @@
+import "./dashboard.styles.css";
 import { useState } from "react";
 import { Activity, ArrowRight, ArrowUpRight, BookOpen, Check, CheckCircle2, ChevronDown, Clock3, FileText, Filter, FlaskConical, Globe2, Link2, LoaderCircle, Plus, Search, ShieldCheck, Target, X } from "lucide-react";
 import type { DashboardProps, StatCardProps, WorkflowStepProps, StatusPillProps } from "./dashboard.types";
 import type { ResearchStatus } from "../../types";
-import "./dashboard.css";
 import { selectResearchJobs } from "./researchList";
 import type { DateFilter, ResearchSort, SourceFilter, StatusFilter } from "./researchList";
 import { ResearchActions } from "../research-history/ResearchActions";

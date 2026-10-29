@@ -1,10 +1,10 @@
+import "./research-form.styles.css";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, LoaderCircle, Sparkles } from "lucide-react";
 import type { NewResearchProps } from "./research-form.types";
 import { researchCriteria, researchDepthOptions } from "./research-form.constants";
 import type { CreateResearchRequest } from "../../types";
-import "./research-form.css";
 
 const steps = ["Question", "Criteria", "Context", "Budget"];
 

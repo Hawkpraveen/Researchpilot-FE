@@ -1,3 +1,4 @@
+import "./workspace.styles.css";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Building2, Check, ChevronsLeft, ChevronsRight, FileText, FolderOpen, LayoutDashboard, PanelLeftClose, Pencil, Plus, Search, Settings2, Sparkles, Trash2, X, Zap } from "lucide-react";
