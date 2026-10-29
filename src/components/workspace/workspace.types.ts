@@ -10,6 +10,8 @@ export interface WorkspaceSidebarProps {
   activeJob: ResearchJob | null;
   loading: boolean;
   open: boolean;
+  workspaceExpanded: boolean;
+  onWorkspaceExpandedChange: (expanded: boolean) => void;
   onClose: () => void;
   onOpenJob: (job: ResearchJob) => void;
   onStartNew: () => void;

@@ -1,10 +1,12 @@
-export type ResearchStatus = "completed" | "running" | "queued" | "failed";
+export type ResearchStatus = "completed" | "running" | "queued" | "failed" | "partial" | "needs_clarification";
 
 export interface ResearchJobError {
   code: string;
   message: string;
   retryable: boolean;
 }
+
+export interface ResearchClarification { candidateIndex?: number; context?: string }
 
 export interface ResearchSource {
   id: string;
@@ -23,7 +25,14 @@ export interface ComparisonCell {
 }
 
 export interface ResearchReport {
-  researchStatus: "not_run" | "completed";
+  researchStatus: "not_run" | "completed" | "partial" | "needs_clarification";
+  resolution?: {
+    status: "resolved" | "ambiguous" | "unresolved";
+    subject: string;
+    explanation: string;
+    candidates: Array<{ label: string; description: string; sourceIds: string[] }>;
+    selectedSourceIds: string[];
+  };
   summary: string;
   recommendation: string;
   alternatives: string[];
@@ -33,12 +42,15 @@ export interface ResearchReport {
 }
 
 export interface ResearchJob {
+  request?: { goal: string; depth: "quick" | "standard" | "deep"; criteria: Array<{ id: string; label: string; weight: number }>; constraints: string[]; alternatives: string[] };
   id: string;
   title: string;
   question: string;
   status: ResearchStatus;
   createdAt: string;
   updatedAt: string;
+  createdAtIso?: string;
+  updatedAtIso?: string;
   progress: number;
   currentStage: string;
   sourceCount: number;

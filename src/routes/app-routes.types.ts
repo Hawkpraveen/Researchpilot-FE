@@ -1,5 +1,6 @@
+import type { ResearchReportTab } from "../components/research-report/research-report.types";
 import type { FormEvent } from "react";
-import type { AuthSession, CreateResearchRequest, ProviderConfig, ResearchJob } from "../types";
+import type { AuthSession, CreateResearchRequest, ProviderConfig, ResearchJob, ResearchClarification } from "../types";
 
 export interface AppRoutesProps {
   session: AuthSession | null;
@@ -24,14 +25,17 @@ export interface AppRoutesProps {
   query: string;
   onQueryChange: (query: string) => void;
   onOpenJob: (job: ResearchJob) => void;
+  onRenameJob: (job: ResearchJob, title: string) => Promise<void>;
+  onDeleteJob: (job: ResearchJob) => Promise<void>;
   onStartNew: () => void;
+  onRestartResearch: (job: ResearchJob, clarification?: ResearchClarification) => Promise<void>;
   onSubmitResearch: (event: FormEvent<HTMLFormElement>) => void;
   form: CreateResearchRequest;
   onFormChange: (form: CreateResearchRequest) => void;
   onToggleCriterion: (criterion: string) => void;
   submitting: boolean;
-  activeReportTab: "overview" | "evidence";
-  onReportTabChange: (tab: "overview" | "evidence") => void;
+  activeReportTab: ResearchReportTab;
+  onReportTabChange: (tab: ResearchReportTab) => void;
   providerConfig: ProviderConfig;
   connectionState: { connected: boolean; message: string } | null;
   onProviderConfigChange: (config: ProviderConfig) => void;

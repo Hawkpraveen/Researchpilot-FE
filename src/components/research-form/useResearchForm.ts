@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { createResearch } from "../../services/researchApi";
-import type { CreateResearchRequest, ResearchJob } from "../../types";
+import { createResearch, restartResearch } from "../../services/researchApi";
+import type { CreateResearchRequest, ResearchJob, ResearchClarification } from "../../types";
 import { initialForm } from "./constants";
 
 export function useResearchForm(onCreated: (job: ResearchJob) => void) {
@@ -15,6 +15,19 @@ export function useResearchForm(onCreated: (job: ResearchJob) => void) {
     setForm(initialForm);
     setError("");
     navigate("/workspace/research/new");
+  };
+
+  const restart = async (job: ResearchJob, clarification?: ResearchClarification) => {
+    if (submitting) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      const updated = await restartResearch(job.id, clarification);
+      onCreated(updated);
+      navigate(`/workspace/research/${encodeURIComponent(updated.id)}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to continue research.");
+    } finally { setSubmitting(false); }
   };
 
   const toggleCriterion = (criterion: string) => {
@@ -56,6 +69,7 @@ export function useResearchForm(onCreated: (job: ResearchJob) => void) {
     error,
     setError,
     startNew,
+    restart,
     toggleCriterion,
     submit,
   };

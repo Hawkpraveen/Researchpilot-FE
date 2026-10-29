@@ -21,6 +21,11 @@ export function WorkspaceLayout({
 }: WorkspaceLayoutProps) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [workspaceExpanded, setWorkspaceExpanded] = useState(true);
+  const showProjects = () => {
+    setWorkspaceExpanded(true);
+    setSidebarOpen(window.matchMedia("(max-width: 760px)").matches);
+  };
   const isNewResearch = location.pathname.endsWith("/research/new");
   const isReport = /^\/workspace\/research\/[^/]+$/.test(location.pathname) && !isNewResearch;
   const isSettings = location.pathname.endsWith("/settings");
@@ -36,6 +41,8 @@ export function WorkspaceLayout({
         activeJob={activeJob}
         loading={loading}
         open={sidebarOpen}
+        workspaceExpanded={workspaceExpanded}
+        onWorkspaceExpandedChange={setWorkspaceExpanded}
         onClose={() => setSidebarOpen(false)}
         onOpenJob={onOpenJob}
         onStartNew={onStartNew}
@@ -43,11 +50,10 @@ export function WorkspaceLayout({
       <main className="main-area">
         <header className="topbar">
           <div className="breadcrumbs">
-            <button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setSidebarOpen(true)}><Menu size={19} /></button>
+            <button className="icon-button mobile-menu" aria-label="Open menu" onClick={showProjects}><Menu size={19} /></button>
             <span className="hidden sm:inline">Workspace</span><span className="crumb-separator hidden sm:inline">/</span><strong>{pageTitle}</strong>
           </div>
           <div className="topbar-actions">
-            <span className="environment-badge"><span /> {import.meta.env.DEV ? "Development environment" : "Research workspace"}</span>
             <button className="icon-button help-button" aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`} onClick={onToggleTheme}>
               {theme === "light" ? <Moon size={17} /> : <Sun size={17} />}
             </button>

@@ -2,6 +2,7 @@ import { Navigate, Outlet, Route, Routes, useNavigate, useParams } from "react-r
 import { AuthView } from "../components/auth/AuthPage";
 import { Dashboard } from "../components/dashboard/DashboardPage";
 import { NewResearch } from "../components/research-form/NewResearchPage";
+
 import { ReportView } from "../components/research-report/ResearchReportPage";
 import { SettingsView } from "../components/settings/SettingsPage";
 import { ProfileSettingsPage } from "../components/workspace/ProfileSettingsPage";
@@ -75,7 +76,7 @@ export function AppRoutes(props: AppRoutesProps) {
           /> : <Navigate replace to="/login" />}
         >
           <Route index element={<Dashboard
-            jobs={props.filteredJobs}
+            jobs={props.jobs}
             loading={props.loading}
             activeJob={props.activeJob}
             query={props.query}
@@ -83,7 +84,9 @@ export function AppRoutes(props: AppRoutesProps) {
             onNew={props.onStartNew}
             onOpenJob={props.onOpenJob}
             onViewReport={() => props.activeJob && props.onOpenJob(props.activeJob)}
-            onRetry={props.onStartNew}
+            onRenameJob={props.onRenameJob}
+            onDeleteJob={props.onDeleteJob}
+            onRetry={() => props.activeJob ? props.onOpenJob(props.activeJob) : props.onStartNew()}
           />} />
           <Route path="research/new" element={<NewResearch
             form={props.form}
@@ -111,12 +114,13 @@ export function AppRoutes(props: AppRoutesProps) {
   );
 }
 
-function ResearchJobRoute({ jobs, activeJob, activeReportTab, onReportTabChange, onStartNew }: AppRoutesProps) {
+function ResearchJobRoute({ jobs, activeJob, activeReportTab, onReportTabChange, onStartNew, onRestartResearch, onRenameJob, onDeleteJob, submitting, loading }: AppRoutesProps) {
   const { jobId } = useParams();
   const navigate = useNavigate();
   const job = jobs.find((item) => item.id === jobId) ?? (activeJob?.id === jobId ? activeJob : null);
 
   if (!job) {
+    if (loading) return <div className="empty-state" role="status"><h2>Loading research…</h2></div>;
     return <div className="empty-state"><h2>Research not found</h2><p>This research run does not exist in the current session.</p><button className="primary-button" onClick={() => navigate("/workspace")}>Back to overview</button></div>;
   }
 
@@ -126,5 +130,10 @@ function ResearchJobRoute({ jobs, activeJob, activeReportTab, onReportTabChange,
     onTabChange={onReportTabChange}
     onBack={() => navigate("/workspace")}
     onNew={onStartNew}
+    onRenameJob={onRenameJob}
+    onDeleteJob={onDeleteJob}
+    onRetry={() => void onRestartResearch(job)}
+    onClarify={(clarification) => void onRestartResearch(job, clarification)}
+    busy={submitting}
   />;
 }

@@ -99,8 +99,9 @@ export function ProfileSettingsPage({
   };
 
   return <div className="profile-settings-page">
-    <div className="profile-settings-heading"><span className="eyebrow"><UserRound size={14} /> ACCOUNT</span><h1>Profile settings</h1><p>Update your personal details and review how you sign in.</p></div>
+    <div className="profile-settings-heading"><span className="eyebrow"><UserRound size={14} /> ACCOUNT</span><h1>Profile settings</h1><p>Keep your profile up to date so your workspace feels like yours.</p></div>
     <section className="form-card surface-card profile-settings-card">
+      <div className="profile-card-heading"><div><span className="profile-section-kicker">PERSONAL DETAILS</span><h2>Make it yours</h2></div><span className="profile-card-caption">Changes apply across your workspace</span></div>
       <div className="profile-settings-identity">
         <ProfileAvatar url={user.profile_url} initials={initials} className="profile-settings-avatar" />
         <div><h2>{[user.first_name, user.last_name].filter(Boolean).join(" ") || user.email}</h2><p>{user.email}</p></div>
@@ -119,7 +120,7 @@ export function ProfileSettingsPage({
           <label className="field-label" htmlFor="profile-first-name">First name<input id="profile-first-name" value={firstName} onChange={(event) => setFirstName(event.target.value)} maxLength={100} autoComplete="given-name" required /></label>
           <label className="field-label" htmlFor="profile-last-name">Last name<input id="profile-last-name" value={lastName} onChange={(event) => setLastName(event.target.value)} maxLength={50} autoComplete="family-name" required /></label>
         </div>
-        <label className="field-label" htmlFor="profile-email">Email address<input id="profile-email" value={user.email} readOnly aria-readonly="true" /></label>
+        <div className="profile-email-field"><label className="field-label" htmlFor="profile-email">Email address<input id="profile-email" value={user.email} readOnly aria-readonly="true" /></label><span className="profile-managed-tag">Managed</span></div>
         <div className="profile-security-note"><ShieldCheck size={15} /><span>Email and sign-in provider are managed by your account. Workspace name can be edited in Workspace settings.</span></div>
         {error && <p className="profile-form-message error" role="alert">{error}</p>}
         {notice && <p className="profile-form-message success" role="status">{notice}</p>}

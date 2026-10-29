@@ -1,3 +1,4 @@
+import type { ResearchReportTab } from "../components/research-report/research-report.types";
 import { useState } from "react";
 import { AppRoutes } from "../routes/AppRoutes";
 import { useAuth } from "../components/auth/useAuth";
@@ -12,7 +13,7 @@ function App() {
   const history = useResearchHistory(Boolean(auth.session));
   const researchForm = useResearchForm(history.addJob);
   const providerSettings = useProviderSettings(Boolean(auth.session));
-  const [activeReportTab, setActiveReportTab] = useState<"overview" | "evidence">("overview");
+  const [activeReportTab, setActiveReportTab] = useState<ResearchReportTab>("overview");
 
   const startNewResearch = () => {
     history.setError("");
@@ -52,7 +53,10 @@ function App() {
     query={history.query}
     onQueryChange={history.setQuery}
     onOpenJob={history.openJob}
+    onRenameJob={history.renameJob}
+    onDeleteJob={history.deleteJob}
     onStartNew={startNewResearch}
+    onRestartResearch={researchForm.restart}
     onSubmitResearch={researchForm.submit}
     form={researchForm.form}
     onFormChange={researchForm.setForm}

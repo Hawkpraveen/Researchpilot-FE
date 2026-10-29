@@ -9,6 +9,8 @@ export interface DashboardProps {
   onQueryChange: (query: string) => void;
   onNew: () => void;
   onOpenJob: (job: ResearchJob) => void;
+  onRenameJob: (job: ResearchJob, title: string) => Promise<void>;
+  onDeleteJob: (job: ResearchJob) => Promise<void>;
   onViewReport: () => void;
   onRetry: () => void;
 }

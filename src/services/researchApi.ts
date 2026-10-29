@@ -1,4 +1,4 @@
-import type { CreateResearchRequest, ProviderConfig, ResearchJob, ResearchReport } from "../types";
+import type { CreateResearchRequest, ProviderConfig, ResearchJob, ResearchReport, ResearchClarification } from "../types";
 import { request } from "./apiClient";
 import { messages } from "../constants/messages";
 
@@ -116,7 +116,7 @@ const demoJobs: ResearchJob[] = [
 export async function listResearch(): Promise<ResearchJob[]> {
   if (RESEARCH_DEMO_MODE) {
     await wait(180);
-    return demoJobs;
+    return structuredClone(demoJobs);
   }
   return request<ResearchJob[]>("/research-jobs");
 }
@@ -131,25 +131,64 @@ export async function getResearch(id: string): Promise<ResearchJob> {
   return request<ResearchJob>(`/research-jobs/${encodeURIComponent(id)}`);
 }
 
+export async function renameResearch(id: string, title: string): Promise<ResearchJob> {
+  if (RESEARCH_DEMO_MODE) {
+    const job = await getResearch(id);
+    if (!title.trim() || title.trim().length > 200) throw new Error("Enter a title between 1 and 200 characters.");
+    job.title = title.trim();
+    job.updatedAtIso = new Date().toISOString();
+    job.updatedAt = new Date().toLocaleString();
+    return { ...job };
+  }
+  return request<ResearchJob>(`/research-jobs/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ title }) });
+}
+
+export async function deleteResearch(id: string): Promise<void> {
+  if (RESEARCH_DEMO_MODE) {
+    const job = await getResearch(id);
+    if (["queued", "running"].includes(job.status)) throw new Error("Wait for this research to finish before deleting it.");
+    demoJobs.splice(demoJobs.findIndex((item) => item.id === id), 1);
+    return;
+  }
+  await request<void>(`/research-jobs/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
 export async function createResearch(input: CreateResearchRequest): Promise<ResearchJob> {
   if (RESEARCH_DEMO_MODE) {
     await wait(450);
     const title = input.question.length > 48 ? `${input.question.slice(0, 45)}…` : input.question;
-    return {
+    const job: ResearchJob = {
       id: `demo-${Date.now()}`,
       title,
       question: input.question,
       status: "running",
       createdAt: "Just now",
       updatedAt: "Just now",
+      createdAtIso: new Date().toISOString(),
+      updatedAtIso: new Date().toISOString(),
       progress: 8,
       currentStage: "Planning research questions",
       sourceCount: 0,
       report: undefined,
     };
+    demoJobs.unshift(job);
+    return { ...job };
   }
   const created = await request<{ jobId: string }>("/research-jobs", { method: "POST", body: JSON.stringify(toApiRequest(input)) });
   return request<ResearchJob>(`/research-jobs/${encodeURIComponent(created.jobId)}`);
+}
+
+export async function restartResearch(id: string, clarification?: ResearchClarification): Promise<ResearchJob> {
+  if (RESEARCH_DEMO_MODE) {
+    const job = demoJobs.find((item) => item.id === id);
+    if (!job) throw new Error(messages.researchNotFound);
+    Object.assign(job, { status: "queued", progress: 0, report: undefined, error: null, currentStage: "Research queued again", updatedAt: "Just now" });
+    return { ...job };
+  }
+  await request(`/research-jobs/${encodeURIComponent(id)}/${clarification ? "clarify" : "retry"}`, {
+    method: "POST", ...(clarification ? { body: JSON.stringify(clarification) } : {}),
+  });
+  return getResearch(id);
 }
 
 export async function saveProviderConfig(config: ProviderConfig): Promise<void> {
