@@ -7,7 +7,7 @@ interface GoogleIdentityApi {
   accounts: {
     id: {
       initialize(options: { client_id: string; callback: (response: GoogleCredentialResponse) => void }): void;
-      renderButton(parent: HTMLElement, options: { theme: "outline" | "filled_black"; size: "large"; shape: "rectangular"; text: "continue_with"; width: number }): void;
+      renderButton(parent: HTMLElement, options: { theme: "outline" | "outline_dark"; size: "large"; shape: "pill"; text: "continue_with"; width: number }): void;
     };
   };
 }
@@ -79,6 +79,7 @@ export function OAuthButtons({
   useEffect(() => {
     if (!googleClientId || !googleButton.current) return;
     let cancelled = false;
+    let resizeObserver: ResizeObserver | undefined;
     activeGoogleHandler = (idToken) => { void oauthHandler.current("google", idToken); };
     void loadGoogleIdentity().then((google) => {
       if (cancelled || !googleButton.current) return;
@@ -95,19 +96,32 @@ export function OAuthButtons({
         setGoogleError("Google sign-in is already initialized with a different client ID. Reload after updating your environment.");
         return;
       }
-      google.accounts.id.renderButton(googleButton.current, {
-        theme: theme === "dark" ? "filled_black" : "outline",
-        size: "large",
-        shape: "rectangular",
-        text: "continue_with",
-        width: 180,
-      });
+      const container = googleButton.current;
+      let renderedWidth = 0;
+      const render = () => {
+        if (cancelled) return;
+        const width = Math.min(400, Math.floor(container.getBoundingClientRect().width));
+        if (width <= 0 || width === renderedWidth) return;
+        renderedWidth = width;
+        container.replaceChildren();
+        google.accounts.id.renderButton(container, {
+          theme: theme === "dark" ? "outline_dark" : "outline",
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+          width,
+        });
+      };
+      render();
+      resizeObserver = new ResizeObserver(render);
+      resizeObserver.observe(container);
       setGoogleError("");
     }).catch((error: unknown) => {
       if (!cancelled) setGoogleError(error instanceof Error ? error.message : "Google sign-in could not be loaded.");
     });
     return () => {
       cancelled = true;
+      resizeObserver?.disconnect();
       activeGoogleHandler = undefined;
     };
   }, [theme]);
@@ -131,8 +145,8 @@ export function OAuthButtons({
   const googleConfigured = Boolean(googleClientId && googleClientId !== "***");
   const microsoftConfigured = Boolean(microsoftClientId && microsoftClientId !== "***");
 
-  return <div className="w-full">
-    <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-2">
+  return <div className="oauth-providers">
+    <div className="oauth-provider-grid">
       {googleConfigured
         ? <div ref={googleButton} className={`oauth-google-button ${loading ? "oauth-button-loading" : ""}`} aria-label="Continue with Google" />
         : <button type="button" className="oauth-provider-placeholder" disabled title="Google sign-in is unavailable"><span className="oauth-provider-g">G</span>Google</button>}

@@ -2343,10 +2343,18 @@ html[data-theme="dark"] .model-picker-options button:hover, html[data-theme="dar
 .auth-options-panel .oauth-grid button {
 
   @apply [min-height:45px] [justify-content:flex-start] [padding:0_14px] [border-color:#dce1eb] [border-radius:10px] [color:#33415a] [background:#fff] [font-size:12px]; }
-.oauth-google-button {
-  @apply [display:flex] [min-width:0] [min-height:44px] [align-items:center] [overflow:hidden];
+.oauth-providers { width: 100%; min-width: 0; container-type: inline-size; }
+.oauth-provider-grid { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 12px; }
+.oauth-provider-grid > * { width: 100%; max-width: 400px; min-width: 0; justify-self: center; }
+@container (min-width: 440px) {
+  .oauth-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.oauth-google-button iframe { max-width: 100%; }
+.oauth-google-button {
+  display: flex; min-width: 0; min-height: 40px; align-items: center; justify-content: center;
+}
+/* Google's iframe includes its own spacing. Shrinking it clips the button. */
+.oauth-google-button iframe { display: block; border: 0; max-width: none; }
+.oauth-provider-grid .oauth-provider-placeholder { min-height: 40px; height: 40px; padding-block: 0; border-radius: 9999px; }
 .oauth-button-loading { opacity: .6; pointer-events: none; }
 .oauth-provider-placeholder {
   @apply [display:inline-flex] [min-width:0] [min-height:44px] [align-items:center] [justify-content:center] [gap:8px] [padding:9px_8px] [border:1px_solid_#dce1eb] [border-radius:10px] [color:#33415a] [background:#fff] [font-size:12px] [font-weight:700];
