@@ -13,6 +13,19 @@
 .ollama-browser-setup[open] { display: flex; flex-direction: column; gap: 14px; }
 .ollama-browser-setup pre { margin: 0; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
 .ollama-browser-setup a { color: var(--purple); font-size: 12px; }
+.local-setup-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.local-setup-steps button { display: flex; align-items: center; gap: 8px; width: 100%; height: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+.local-setup-steps button[aria-current="step"] { border-color: var(--purple); color: var(--ink); background: color-mix(in srgb, var(--purple) 12%, transparent); }
+.local-setup-steps button:disabled { cursor: default; opacity: 1; }
+.local-setup-steps button > span { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: color-mix(in srgb, var(--purple) 16%, transparent); color: var(--ink); }
+.local-setup-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.local-setup-panel h3 { margin: 0; font-size: 15px; color: var(--ink); }
+.local-setup-panel a { color: var(--purple); }
+.local-setup-panel .field-label, .local-setup-panel pre { width: 100%; }
+.local-connector > a.primary-button { align-self: flex-start; text-decoration: none; }
+#local-model-setup, #cloud-model-setup { scroll-margin-top: 90px; }
+.settings-help-card > p { color: var(--muted); font-size: 13px; line-height: 1.65; }
+@media (max-width: 480px) { .local-setup-steps { grid-template-columns: 1fr; } }
 
 /* settings component styles, including responsive and theme variants. */
 

@@ -26,20 +26,18 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         <div>
           <div className="eyebrow"><Settings2 size={14} /> WORKSPACE CONFIGURATION</div>
           <h1>Connect your research engine</h1>
-          <p>Choose how ResearchPilot runs models, then verify the connection before you start a run.</p>
+          <p>Start by choosing a provider below. We’ll walk you through connecting it and choosing a model.</p>
         </div>
-        <div className="settings-hero-badge"><Sparkles size={16} /><span>Ready when you are</span></div>
+        <div className="settings-hero-badge"><Sparkles size={16} /><span>Guided setup</span></div>
       </div>
 
       <div className="settings-layout">
         <div className="settings-main">
 
-      <WorkspaceNameSettings workspaceName={workspaceName} onSave={onSaveWorkspaceName} />
-
-      <section className="form-card surface-card settings-card">
+      <section id="provider-setup" tabIndex={-1} className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><Zap size={15} /></span>
-          <div><h2>Research agent</h2><p>Choose which provider will run research.</p></div>
+          <div><h2>Where should your model run?</h2><p>Choose Local LLM to use Ollama on this computer. Or choose a provider you already have an API key for.</p></div>
         </div>
         <label className="field-label mt-4" htmlFor="research-agent">Agent / provider
           <select id="research-agent" value={`${config.mode}:${config.provider}`} onChange={(event) => chooseAgent(event.target.value)}>
@@ -51,12 +49,12 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         </label>
       </section>
 
-      {config.mode === "local" ? <LocalConnector config={config} onChange={onChange} /> : <section className="form-card surface-card settings-card">
+      {config.mode === "local" ? <LocalConnector config={config} onChange={onChange} /> : <section id="cloud-model-setup" tabIndex={-1} className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><Activity size={15} /></span>
           <div>
             <h2>Provider connection</h2>
-            <p>The browser never calls model providers directly.</p>
+            <p>Enter your API key and model, test the connection, then save your configuration.</p>
           </div>
         </div>
         <div className="settings-fields grid grid-cols-1 gap-3 min-[761px]:grid-cols-2">
@@ -98,6 +96,8 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         <p className="provider-test-note">Testing uses these current selections and any saved key for the same provider and endpoint. It does not save your changes.</p>
       </section>}
 
+      <WorkspaceNameSettings workspaceName={workspaceName} onSave={onSaveWorkspaceName} />
+
       <section className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><ShieldCheck size={15} /></span>
@@ -133,10 +133,13 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
             <p>{config.mode === "local" ? "Only your connected computer receives model requests. Keep Ollama running and your ResearchPilot tab open while you research." : "Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API."}</p>
           </section>
           <section className="settings-help-card">
-            <span className="nav-label">QUICK GUIDE</span>
-            <div><span>1</span><p>{config.mode === "local" ? "Connect Ollama" : "Pick your provider"}</p></div>
-            <div><span>2</span><p>{config.mode === "local" ? "Choose an installed model" : "Enter the endpoint and model"}</p></div>
-            <div><span>3</span><p>{config.mode === "local" ? "Start your research" : "Test, then save"}</p></div>
+            <span className="nav-label">NEED A HAND?</span>
+            <p>{config.mode === "local" ? "Follow the three steps in the local model guide. Your model list appears after Ollama connects." : "Add your provider details, test them, then save. Testing alone does not save your choices."}</p>
+            <button className="settings-rail-link" type="button" onClick={() => {
+              const section = document.getElementById(config.mode === "local" ? "local-model-setup" : "cloud-model-setup");
+              section?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+              section?.focus({ preventScroll: true });
+            }}>Take me to setup <ArrowUpRight size={14} /></button>
           </section>
         </aside>
       </div>

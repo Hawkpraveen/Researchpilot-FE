@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { CheckCircle2, Laptop, LoaderCircle, Unplug } from "lucide-react";
 import { request } from "../../services/apiClient";
 import { saveProviderConfig } from "../../services/researchApi";
@@ -14,6 +15,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
   const [error, setError] = useState("");
   const [desktop, setDesktop] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [guideStep, setGuideStep] = useState(0);
   const [platform, setPlatform] = useState(navigator.platform.includes("Mac") ? "mac" : navigator.platform.includes("Win") ? "windows" : "linux");
   const connected = relay.phase === "ready";
   const connecting = relay.phase === "connecting";
@@ -45,8 +47,26 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
     <DesktopConnector config={config} onChange={onChange} />
   </>;
 
-  return <section className="form-card surface-card settings-card local-connector">
-    <div className="form-section-title"><span className="form-step"><Laptop size={18} /></span><div><h2>Your local models</h2><p>Connect to Ollama directly through this browser. No ResearchPilot app download.</p></div></div>
+  return <section id="local-model-setup" tabIndex={-1} className="form-card surface-card settings-card local-connector">
+    <div className="form-section-title"><span className="form-step"><Laptop size={18} /></span><div><h2>Let’s connect your local model</h2><p>We’ll guide you through it. You only need to allow this website once on each computer.</p></div></div>
+    <ol className="local-setup-steps" aria-label="Local model setup progress">
+      {["Open Ollama", "Allow this website", "Choose your model"].map((label, index) => <li key={label}>
+        <button type="button" aria-current={(connected ? 2 : guideStep) === index ? "step" : undefined} disabled={connected || connecting} onClick={() => setGuideStep(index)}>
+          <span>{connected && (index < 2 || selected) ? <CheckCircle2 size={16} /> : index + 1}</span>{label}
+        </button>
+      </li>)}
+    </ol>
+    {!connected && guideStep === 0 && <div className="local-setup-panel">
+      <h3>1. Open Ollama on this computer</h3>
+      <p>Ollama runs the model on your computer. If you already use it, open it now.</p>
+      <p>New to Ollama? <a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama</a>, open it, and download a chat model in Ollama before continuing.</p>
+      <button className="primary-button" type="button" onClick={() => setGuideStep(1)}>Ollama is open — next</button>
+      <button className="text-button" type="button" onClick={() => setGuideStep(2)}>Already set up this website? Connect now</button>
+    </div>}
+    {!connected && guideStep === 2 && <div className="local-setup-panel">
+      <h3>3. Connect, then choose your model</h3>
+      <p>Click Connect Ollama below. If your browser asks to access this computer’s local network, choose Allow. Your installed models will appear here after it connects.</p>
+    </div>}
     <p className={connected ? "local-connector-status" : ""} role="status">{connected && <CheckCircle2 size={16} />}{relay.message}</p>
     {connected ? <>
       <label className="field-label" htmlFor="browser-local-model">Model
@@ -56,18 +76,18 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
         </select>
       </label>
       {!relay.models.length && <p>Install a chat model in Ollama. It will appear here automatically. Embedding models are excluded.</p>}
-      {selected && <p className="local-connector-status"><CheckCircle2 size={16} /> Ready to research. Model selection is saved automatically.</p>}
+      {selected && <><p className="local-connector-status"><CheckCircle2 size={16} /> You’re ready! Your model choice is saved.</p><Link className="primary-button" to="/workspace/research/new">Start your first research</Link></>}
       <p className="local-connector-hint">Keep Ollama running and this tab open while research runs. Prompts and results pass through ResearchPilot; model inference runs on your computer.</p>
       <button className="text-button" type="button" onClick={() => { void disconnect(); }}><Unplug size={14} /> Disconnect</button>
-    </> : <div className="local-connector-actions">
+    </> : guideStep === 2 && <div className="local-connector-actions">
       <button className="primary-button" type="button" disabled={connecting} onClick={() => { setError(""); browserOllama.connect(); }}>
         {connecting ? <LoaderCircle size={15} className="spin" /> : <Laptop size={15} />}{connecting ? "Connecting…" : "Connect Ollama"}
       </button>
       {connecting && <button className="secondary-button" type="button" onClick={() => browserOllama.stop(true)}>Cancel</button>}
     </div>}
-    {!connected && <details className="ollama-browser-setup" key={relay.phase === "error" ? "error" : "setup"} open={relay.phase === "error" ? true : undefined}>
-      <summary>First-time Ollama browser setup</summary>
-      <p>Ollama must be installed with a chat model. Allow this website in Ollama once, then allow local access when your browser asks.</p>
+    {!connected && (guideStep === 1 || (guideStep === 2 && relay.phase === "error")) && <div className="ollama-browser-setup local-setup-panel">
+      <h3>2. Allow ResearchPilot to use Ollama</h3>
+      <p>This one-time step lets this website talk to Ollama. Copy the command below, paste it into {platform === "windows" ? "PowerShell" : "Terminal"}, and press Enter. Then come back here.</p>
       <label className="field-label" htmlFor="ollama-setup-platform">Your computer
         <select id="ollama-setup-platform" value={platform} onChange={event => { setPlatform(event.target.value); setCopied(false); }}><option value="windows">Windows</option><option value="mac">macOS</option><option value="linux">Linux</option></select>
       </label>
@@ -76,7 +96,8 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
       <button className="secondary-button" type="button" onClick={() => { void navigator.clipboard.writeText(command).then(() => setCopied(true)).catch(() => setCopied(false)); }}>{copied ? "Copied" : "Copy setup command"}</button>
       <p className="local-connector-hint">If OLLAMA_ORIGINS already contains other websites, add this website to that list. Keep Ollama on its default local address. If browser access was blocked, allow it in this site's browser permissions and reconnect.</p>
       <a href="https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama" target="_blank" rel="noreferrer">Ollama setup guide</a>
-    </details>}
+      <button className="primary-button" type="button" disabled={connecting} onClick={() => setGuideStep(2)}>I’ve finished setup — next</button>
+    </div>}
     {error && <p className="local-connector-error" role="alert">{error}</p>}
     <button className="text-button" type="button" onClick={() => setDesktop(true)}>Other option: use the desktop connector</button>
   </section>;
