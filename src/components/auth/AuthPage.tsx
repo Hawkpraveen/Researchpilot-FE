@@ -103,7 +103,7 @@ export function AuthView({ mode, theme, onThemeChange, onModeChange, loading, er
         </form>
         <p className="mt-3 self-center text-[12px] text-[#7d8799] [.auth-dark_&]:text-[#a6b2c8]">New to ResearchPilot? <button className="font-bold text-[#5d53ca] transition hover:text-[#4037b5] focus-visible:outline-none focus-visible:underline [.auth-dark_&]:text-[#b4adff] [.auth-dark_&]:hover:text-[#d2ccff]" type="button" onClick={startSignup}>Create an account</button></p>
         {error && <div className="mt-5 flex items-center gap-2 rounded-xl border border-[#f3cdd1] bg-[#fff3f4] px-3 py-2.5 text-[12px] text-[#b34d57] [.auth-dark_&]:border-[#633743] [.auth-dark_&]:bg-[#3a202b] [.auth-dark_&]:text-[#ff9fa8]"><AlertCircle size={14} /> {error}</div>}
-        <div className="hidden md:block">
+        <div>
           <div className="my-6 flex items-center gap-3 text-[12px] text-[#a3a8b2] before:h-px before:flex-1 before:bg-[#eceef3] after:h-px after:flex-1 after:bg-[#eceef3] [.auth-dark_&]:text-[#8290a8] [.auth-dark_&]:before:bg-[#2c3850] [.auth-dark_&]:after:bg-[#2c3850]"><span>OR CONTINUE WITH</span></div>
           <OAuthButtons loading={loading} theme={theme} onOAuth={onOAuth} />
         </div>

@@ -132,7 +132,7 @@ export function OAuthButtons({
   const microsoftConfigured = Boolean(microsoftClientId && microsoftClientId !== "***");
 
   return <div className="w-full">
-    <div className="grid w-full grid-cols-2 items-center gap-3">
+    <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-2">
       {googleConfigured
         ? <div ref={googleButton} className={`oauth-google-button ${loading ? "oauth-button-loading" : ""}`} aria-label="Continue with Google" />
         : <button type="button" className="oauth-provider-placeholder" disabled title="Configure VITE_GOOGLE_CLIENT_ID to enable Google sign-in"><span className="oauth-provider-g">G</span>Google</button>}
