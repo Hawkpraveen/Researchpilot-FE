@@ -1,5 +1,14 @@
 @reference "tailwindcss";
 
+.local-connector { display: flex; flex-direction: column; gap: 18px; }
+.local-connector p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.local-connector .local-connector-status { display: flex; align-items: center; gap: 8px; color: #269d79; }
+.local-connector-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.local-connector-actions a { text-decoration: none; }
+.local-connector .local-connector-hint { font-size: 12px; }
+.local-connector .local-connector-error { color: #db6b79; }
+.local-connector .text-button { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; }
+
 /* settings component styles, including responsive and theme variants. */
 
 .settings-page {

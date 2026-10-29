@@ -10,6 +10,14 @@ OAuth providers, phone OTP, and 2FA are UI placeholders and are not enabled.
 
 ## Source structure
 
+Local model users select **Local LLM (your computer)** in Settings. The Windows
+connector download is served from `public/downloads/`. After a one-time pairing
+and browser local-network approval, choosing an installed model saves it
+automatically. The connector source and reproducible Windows build script live
+in the independent agent repository under `connector/`; deploy the connector
+API/backend and updated agent before publishing this UI. The connector, Ollama
+and computer must stay running for local research.
+
 - `src/app/` composes feature hooks and the route tree.
 - `src/routes/` defines URL routes and the authenticated workspace guard.
 - `src/components/<feature>/` contains feature UI, exported prop contracts (`*.types.ts`), and feature hooks (`use*.ts`).

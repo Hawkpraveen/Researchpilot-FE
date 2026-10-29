@@ -3,12 +3,13 @@ import { useLocation } from "react-router-dom";
 import { checkAgentConnection, getProviderConfig, getWorkspaceName, saveProviderConfig, saveWorkspaceName as requestSaveWorkspaceName } from "../../services/researchApi";
 import type { ProviderConfig } from "../../types";
 import { messages } from "../../constants/messages";
+import { request } from "../../services/apiClient";
 
 const defaultConfig: ProviderConfig = {
   mode: "local",
   provider: "ollama",
-  endpoint: "http://localhost:11434",
-  model: "llama3.1",
+  endpoint: "http://connector.local",
+  model: "llama3.2:3b",
   apiKey: "",
 };
 
@@ -23,7 +24,9 @@ export function useProviderSettings(enabled: boolean) {
 
   const testConfig = async (candidate: ProviderConfig) => {
     const sequence = ++testSequence.current;
-    const result = await checkAgentConnection(candidate);
+    const result = candidate.mode === "local"
+      ? await request<{ connected: boolean; message: string; models: string[] }>("/connectors/status")
+      : await checkAgentConnection(candidate);
     if (sequence === testSequence.current) setConnectionState(result);
   };
 

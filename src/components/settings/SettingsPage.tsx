@@ -5,6 +5,7 @@ import { useSettingsForm } from "./useSettingsForm";
 import type { ProviderConfig } from "../../types";
 import { useState } from "react";
 import { WorkspaceNameSettings } from "./WorkspaceNameSettings";
+import { LocalConnector, CONNECTOR_ENDPOINT } from "./LocalConnector";
 
 export function SettingsView({ config, connectionState, onChange, onSave, onTest, workspaceName, onSaveWorkspaceName }: SettingsProps) {
   const { saving, update, save } = useSettingsForm(config, onChange, onSave);
@@ -13,7 +14,7 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
   const chooseAgent = (value: string) => {
     const [mode, provider] = value.split(":") as [ProviderConfig["mode"], ProviderConfig["provider"]];
     setManualModel(false);
-    if (provider === "ollama") update({ mode, provider, endpoint: "http://localhost:11434", model: "llama3.1", apiKey: "" });
+    if (provider === "ollama") update({ mode, provider, endpoint: CONNECTOR_ENDPOINT, model: "llama3.2:3b", apiKey: "" });
     else if (provider === "openai") update({ mode, provider, endpoint: "https://api.openai.com/v1", model: "", apiKey: "" });
     else if (provider === "anthropic") update({ mode, provider, endpoint: "https://api.anthropic.com", model: "", apiKey: "" });
     else update({ mode, provider, model: "", apiKey: "" });
@@ -42,7 +43,7 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         </div>
         <label className="field-label mt-4" htmlFor="research-agent">Agent / provider
           <select id="research-agent" value={`${config.mode}:${config.provider}`} onChange={(event) => chooseAgent(event.target.value)}>
-            <option value="local:ollama">Ollama (local)</option>
+            <option value="local:ollama">Local LLM (your computer)</option>
             <option value="byok:openai">OpenAI</option>
             <option value="byok:anthropic">Anthropic Claude</option>
             <option value="byok:custom">Custom OpenAI-compatible</option>
@@ -50,12 +51,12 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         </label>
       </section>
 
-      <section className="form-card surface-card settings-card">
+      {config.mode === "local" ? <LocalConnector config={config} onChange={onChange} /> : <section className="form-card surface-card settings-card">
         <div className="form-section-title">
           <span className="form-step"><Activity size={15} /></span>
           <div>
-            <h2>{config.mode === "local" ? "Local agent connection" : "Provider connection"}</h2>
-            <p>{config.mode === "local" ? "The API should reach Ollama through the local agent service." : "The browser never calls model providers directly."}</p>
+            <h2>Provider connection</h2>
+            <p>The browser never calls model providers directly.</p>
           </div>
         </div>
         <div className="settings-fields grid grid-cols-1 gap-3 min-[761px]:grid-cols-2">
@@ -95,7 +96,7 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
           </div>
         )}
         <p className="provider-test-note">Testing uses these current selections and any saved key for the same provider and endpoint. It does not save your changes.</p>
-      </section>
+      </section>}
 
       <section className="form-card surface-card settings-card">
         <div className="form-section-title">
@@ -120,22 +121,22 @@ export function SettingsView({ config, connectionState, onChange, onSave, onTest
         </div>
 
         <aside className="settings-rail">
-          <section className="settings-status-card">
+          {config.mode !== "local" && <section className="settings-status-card">
             <div className="settings-status-heading"><span className="settings-status-icon"><Activity size={16} /></span><span><strong>Connection status</strong><small>Current workspace setup</small></span></div>
             <div className={`settings-status-value ${connectionState?.connected ? "is-connected" : ""}`}><span className="status-dot" />{connectionState?.connected ? "Connected" : "Not tested yet"}</div>
             <p>{connectionState?.message ?? "Run a connection test to confirm that your selected provider is reachable."}</p>
             <button className="settings-rail-link" type="button" onClick={onTest}>Test connection <ArrowUpRight size={14} /></button>
-          </section>
+          </section>}
           <section className="settings-note-card">
             <div className="settings-note-icon"><LockKeyhole size={16} /></div>
-            <strong>Your key stays private</strong>
-            <p>Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API.</p>
+            <strong>{config.mode === "local" ? "Your computer, your models" : "Your key stays private"}</strong>
+            <p>{config.mode === "local" ? "Only your paired computer receives model requests. Keep Ollama and the connector running while you research." : "Keys are sent to the API to test or save a provider. They are never stored in browser storage or returned by the API."}</p>
           </section>
           <section className="settings-help-card">
             <span className="nav-label">QUICK GUIDE</span>
-            <div><span>1</span><p>Pick local or BYO key</p></div>
-            <div><span>2</span><p>Enter the endpoint and model</p></div>
-            <div><span>3</span><p>Test, then save</p></div>
+            <div><span>1</span><p>{config.mode === "local" ? "Open your connector" : "Pick your provider"}</p></div>
+            <div><span>2</span><p>{config.mode === "local" ? "Choose an installed model" : "Enter the endpoint and model"}</p></div>
+            <div><span>3</span><p>{config.mode === "local" ? "Start your research" : "Test, then save"}</p></div>
           </section>
         </aside>
       </div>
