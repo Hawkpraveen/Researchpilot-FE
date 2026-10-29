@@ -20,7 +20,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
   const selected = config.endpoint === CONNECTOR_ENDPOINT && relay.models.includes(config.model) ? config.model : "";
   const origin = window.location.origin;
   const command = platform === "windows"
-    ? `[Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', '${origin}', 'User')`
+    ? `$rpOrigin = '${origin}'\n$rpSaved = [Environment]::GetEnvironmentVariable('OLLAMA_ORIGINS', 'User')\n$env:OLLAMA_ORIGINS = ((@($rpSaved -split ',') + $rpOrigin) | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Select-Object -Unique) -join ','\n[Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', $env:OLLAMA_ORIGINS, 'User')\nStart-Process -FilePath (Join-Path (Split-Path (Get-Command ollama).Source) 'ollama app.exe') -WindowStyle Hidden`
     : platform === "mac" ? `launchctl setenv OLLAMA_ORIGINS "${origin}"`
       : `sudo systemctl edit ollama.service\n\n# Add these lines, then save:\n[Service]\nEnvironment="OLLAMA_ORIGINS=${origin}"\n\n# Apply the change:\nsudo systemctl daemon-reload\nsudo systemctl restart ollama`;
 
@@ -71,7 +71,7 @@ export function LocalConnector({ config, onChange }: { config: ProviderConfig; o
       <label className="field-label" htmlFor="ollama-setup-platform">Your computer
         <select id="ollama-setup-platform" value={platform} onChange={event => { setPlatform(event.target.value); setCopied(false); }}><option value="windows">Windows</option><option value="mac">macOS</option><option value="linux">Linux</option></select>
       </label>
-      <p>{platform === "windows" ? "Quit Ollama from the system tray, run this once in PowerShell, then reopen Ollama." : platform === "mac" ? "Run this once in Terminal, then quit and reopen Ollama." : "Update Ollama's service configuration with this website origin, then restart the service."}</p>
+      <p>{platform === "windows" ? "Quit Ollama from the system tray, then run this once in PowerShell. It saves this website permission and starts Ollama with the new setting." : platform === "mac" ? "Run this once in Terminal, then quit and reopen Ollama." : "Update Ollama's service configuration with this website origin, then restart the service."}</p>
       <pre>{command}</pre>
       <button className="secondary-button" type="button" onClick={() => { void navigator.clipboard.writeText(command).then(() => setCopied(true)).catch(() => setCopied(false)); }}>{copied ? "Copied" : "Copy setup command"}</button>
       <p className="local-connector-hint">If OLLAMA_ORIGINS already contains other websites, add this website to that list. Keep Ollama on its default local address. If browser access was blocked, allow it in this site's browser permissions and reconnect.</p>
